@@ -13,9 +13,15 @@ class Strand(Enum):
     Forward = "+"
     Reverse = "-"
 
+    def __str__(self) -> str:
+        return str(self.value)
+
 
 class PafRecord(NamedTuple):
+    """A single entry (row) in a PAF file."""
+
     qname: str = ""
+    """Query sequence name."""
     qlen: int = -1
     qstart: int = -1
     qend: int = -1
@@ -29,8 +35,36 @@ class PafRecord(NamedTuple):
     mapq: int = -1
     tags: Optional[List[str]] = None
 
+    def __str__(self) -> str:
+        tag_str = "" if self.tags is None else DELIM.join(self.tags)
+        fields = [
+            self.qname,
+            self.qlen,
+            self.qstart,
+            self.qend,
+            self.strand,
+            self.tname,
+            self.tlen,
+            self.tstart,
+            self.tend,
+            self.mlen,
+            self.blen,
+            self.mapq,
+            tag_str,
+        ]
+        return DELIM.join(map(str, fields)).rstrip()
+
     @staticmethod
     def from_str(line: str) -> "PafRecord":
+        """Construct a `PafRecord` from a string.
+
+        ## Example
+        ```py
+        line = "qname\t4"
+        record = PafRecord.from_str(line)
+        ```
+
+        """
         fields = line.rstrip().split(DELIM)
         if len(fields) < MIN_FIELDS:
             raise MalformattedRecord(

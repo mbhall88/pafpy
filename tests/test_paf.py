@@ -1,8 +1,36 @@
 import pytest
-from pafpy.paf import PafRecord, Strand, MalformattedRecord
+
+from pafpy.paf import PafRecord, Strand, MalformattedRecord, DELIM
 
 
-class TestFromStr:
+class TestPafRecordStr:
+    def test_no_tags(self):
+        record = PafRecord()
+
+        actual = str(record)
+        expected = DELIM.join(
+            str(x) for x in PafRecord._field_defaults.values() if x is not None
+        )
+
+        assert actual == expected
+
+    def test_with_tags(self):
+        tags = ["NM:i:1", "ms:i:1906"]
+        record = PafRecord(tags=tags)
+
+        actual = str(record)
+        expected = (
+            DELIM.join(
+                str(x) for x in PafRecord._field_defaults.values() if x is not None
+            )
+            + DELIM
+            + DELIM.join(tags)
+        )
+
+        assert actual == expected
+
+
+class TestPafRecordFromStr:
     def test_empty_str_raises_error(self):
         line = ""
 
