@@ -1,11 +1,10 @@
-from pafpy.paf import PafRecord, Strand
+import pytest
+from pafpy.paf import PafRecord, Strand, MalformattedRecord
 
 
 class TestFromStr:
-    def test_empty_str_returns_empty_record(self):
-        row = ""
+    def test_empty_str_raises_error(self):
+        line = ""
 
-        actual = PafRecord.from_str(row)
-        expected = PafRecord()
-
-        assert actual == expected
+        with pytest.raises(MalformattedRecord):
+            PafRecord.from_str(line)
