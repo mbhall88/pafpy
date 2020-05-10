@@ -18,22 +18,40 @@ class Strand(Enum):
 
 
 class PafRecord(NamedTuple):
-    """A single entry (row) in a PAF file."""
+    """A single entry (row) in a [PAF][paf] file.
+
+    TODO add examples
+
+    [paf]: https://github.com/lh3/miniasm/blob/master/PAF.md
+    """
 
     qname: str = ""
     """Query sequence name."""
     qlen: int = -1
+    """Query sequence length."""
     qstart: int = -1
+    """Query start (0-based; BED-like; closed)."""
     qend: int = -1
+    """Query end (0-based; BED-like; open)."""
     strand: Strand = Strand.Forward
+    """Relative strand: "+" or "-"."""
     tname: str = ""
+    """Target sequence name."""
     tlen: int = -1
+    """Target sequence length."""
     tstart: int = -1
+    """Target start on original strand (0-based)."""
     tend: int = -1
+    """Target end on original strand (0-based)."""
     mlen: int = -1
+    """Number of residue matches."""
     blen: int = -1
+    """Alignment block length, including both alignment matches and gaps but excluding 
+    ambiguous bases."""
     mapq: int = -1
+    """Mapping quality (0-255; 255 for missing)."""
     tags: Optional[List[str]] = None
+    """[SAM-like optional fields (tags)](https://samtools.github.io/hts-specs/SAMtags.pdf)."""
 
     def __str__(self) -> str:
         tag_str = "" if self.tags is None else DELIM.join(self.tags)
@@ -60,10 +78,18 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        line = "qname\t4"
-        record = PafRecord.from_str(line)
-        ```
+        from pafpy.paf import PafRecord
 
+        line = "query_name\t1239\t65\t1239\t+\ttarget_name\t4378340\t2555250\t2556472\t1139\t1228\t60"
+        record = PafRecord.from_str(line)
+
+        assert record.qname == "query_name"
+        assert record.mapq == 60
+        ```
+        
+        ## Errors
+        If there are less than the expected number of fields (12), this function will
+        raise a `MalformattedRecord` exception.
         """
         fields = line.rstrip().split(DELIM)
         if len(fields) < MIN_FIELDS:
