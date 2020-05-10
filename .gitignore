@@ -252,3 +252,4 @@ venv.bak/
 pip-selfcheck.json
 
 # End of https://www.gitignore.io/api/linux,macos,python,jetbrains,virtualenv
+.idea/
