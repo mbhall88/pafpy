@@ -1,4 +1,5 @@
 from unittest.mock import patch, PropertyMock
+from contextlib import ExitStack
 
 import pytest
 
@@ -243,6 +244,88 @@ class TestTargetCoverage:
             record = PafRecord(tlen=tlen)
             actual = record.target_coverage
             mocked_talen.assert_called_once()
+
+        expected = 1.0
+
+        assert actual == expected
+
+
+class TestRelativeLength:
+    def test_unmapped_record_returns_zero(self):
+        record = PafRecord()
+
+        actual = record.relative_length
+        expected = 0.0
+
+        assert actual == expected
+
+    def test_query_shorter_than_target(self):
+        talen = 10
+        qalen = 9
+        patch_talen = "pafpy.pafrecord.PafRecord.target_aligned_length"
+        patch_qalen = "pafpy.pafrecord.PafRecord.query_aligned_length"
+        with ExitStack() as stack:
+            mocked_talen = stack.enter_context(
+                patch(patch_talen, new_callable=PropertyMock)
+            )
+            mocked_qalen = stack.enter_context(
+                patch(patch_qalen, new_callable=PropertyMock)
+            )
+            mocked_talen.return_value = talen
+            mocked_qalen.return_value = qalen
+            record = PafRecord()
+            actual = record.relative_length
+
+            mocked_talen.assert_called_once()
+            mocked_qalen.assert_called_once()
+
+        expected = 0.9
+
+        assert actual == expected
+
+    def test_query_longer_than_target(self):
+        talen = 10
+        qalen = 11
+        patch_talen = "pafpy.pafrecord.PafRecord.target_aligned_length"
+        patch_qalen = "pafpy.pafrecord.PafRecord.query_aligned_length"
+        with ExitStack() as stack:
+            mocked_talen = stack.enter_context(
+                patch(patch_talen, new_callable=PropertyMock)
+            )
+            mocked_qalen = stack.enter_context(
+                patch(patch_qalen, new_callable=PropertyMock)
+            )
+            mocked_talen.return_value = talen
+            mocked_qalen.return_value = qalen
+            record = PafRecord()
+            actual = record.relative_length
+
+            mocked_talen.assert_called_once()
+            mocked_qalen.assert_called_once()
+
+        expected = 1.1
+
+        assert actual == expected
+
+    def test_query_and_target_same_length(self):
+        talen = 10
+        qalen = 10
+        patch_talen = "pafpy.pafrecord.PafRecord.target_aligned_length"
+        patch_qalen = "pafpy.pafrecord.PafRecord.query_aligned_length"
+        with ExitStack() as stack:
+            mocked_talen = stack.enter_context(
+                patch(patch_talen, new_callable=PropertyMock)
+            )
+            mocked_qalen = stack.enter_context(
+                patch(patch_qalen, new_callable=PropertyMock)
+            )
+            mocked_talen.return_value = talen
+            mocked_qalen.return_value = qalen
+            record = PafRecord()
+            actual = record.relative_length
+
+            mocked_talen.assert_called_once()
+            mocked_qalen.assert_called_once()
 
         expected = 1.0
 

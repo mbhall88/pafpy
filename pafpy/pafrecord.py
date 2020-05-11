@@ -127,7 +127,10 @@ class PafRecord(NamedTuple):
         assert record.query_coverage == 0.4
         ```
         """
-        return 0.0 if self.qlen < 1 else self.query_aligned_length / self.qlen
+        try:
+            return self.query_aligned_length / self.qlen
+        except ZeroDivisionError:
+            return 0.0
 
     @property
     def target_coverage(self) -> float:
@@ -143,7 +146,10 @@ class PafRecord(NamedTuple):
         assert record.target_coverage == 0.4
         ```
         """
-        return 0.0 if self.tlen < 1 else self.target_aligned_length / self.tlen
+        try:
+            return self.target_aligned_length / self.tlen
+        except ZeroDivisionError:
+            return 0.0
 
     @property
     def target_aligned_length(self) -> int:
@@ -152,6 +158,25 @@ class PafRecord(NamedTuple):
         This is equal to the absolute value of `tend` - `tstart`.
         """
         return abs(self.tend - self.tstart)
+
+    @property
+    def relative_length(self) -> float:
+        """Relative (aligned) length of the query sequence to the target.
+
+        This is equal to `query_aligned_length` - `target_aligned_length`.
+
+        ## Example
+        ```py
+        from pafpy.pafrecord import PafRecord
+
+        record = PafRecord(qlen=50, qstart=10, qend=20, tlen=100, tstart=50, tend=90)
+        assert record.relative_length == 0.25
+        ```
+        """
+        try:
+            return self.query_aligned_length / self.target_aligned_length
+        except ZeroDivisionError:
+            return 0.0
 
     # methods to implement
     # TODO: blast identity
