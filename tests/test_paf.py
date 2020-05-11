@@ -1,3 +1,5 @@
+from unittest.mock import patch, PropertyMock
+
 import pytest
 
 from pafpy.pafrecord import PafRecord, MalformattedRecord, DELIM
@@ -123,7 +125,7 @@ class TestQueryAlignedLength:
     def test_unmapped_record_returns_zero(self):
         record = PafRecord()
 
-        actual = record.query_alignment_length
+        actual = record.query_aligned_length
         expected = 0
 
         assert actual == expected
@@ -131,7 +133,7 @@ class TestQueryAlignedLength:
     def test_qend_greater_than_qstart(self):
         record = PafRecord(qstart=2, qend=5)
 
-        actual = record.query_alignment_length
+        actual = record.query_aligned_length
         expected = 3
 
         assert actual == expected
@@ -139,7 +141,109 @@ class TestQueryAlignedLength:
     def test_qend_less_than_qstart(self):
         record = PafRecord(qstart=5, qend=2)
 
-        actual = record.query_alignment_length
+        actual = record.query_aligned_length
         expected = 3
+
+        assert actual == expected
+
+
+class TestTargetAlignedLength:
+    def test_unmapped_record_returns_zero(self):
+        record = PafRecord()
+
+        actual = record.target_aligned_length
+        expected = 0
+
+        assert actual == expected
+
+    def test_tend_greater_than_tstart(self):
+        record = PafRecord(tstart=2, tend=5)
+
+        actual = record.target_aligned_length
+        expected = 3
+
+        assert actual == expected
+
+    def test_tend_less_than_tstart(self):
+        record = PafRecord(tstart=5, tend=2)
+
+        actual = record.target_aligned_length
+        expected = 3
+
+        assert actual == expected
+
+
+class TestQueryCoverage:
+    def test_unmapped_record_returns_zero(self):
+        record = PafRecord(qlen=0)
+
+        actual = record.query_coverage
+        expected = 0.0
+
+        assert actual == expected
+
+    def test_part_of_query_aligned(self):
+        qlen = 10
+        qalen = 4
+        patch_target = "pafpy.pafrecord.PafRecord.query_aligned_length"
+        with patch(patch_target, new_callable=PropertyMock) as mocked_qalen:
+            mocked_qalen.return_value = qalen
+            record = PafRecord(qlen=qlen)
+            actual = record.query_coverage
+            mocked_qalen.assert_called_once()
+
+        expected = 0.4
+
+        assert actual == expected
+
+    def test_all_of_query_aligned(self):
+        qlen = 10
+        qalen = 10
+        patch_target = "pafpy.pafrecord.PafRecord.query_aligned_length"
+        with patch(patch_target, new_callable=PropertyMock) as mocked_qalen:
+            mocked_qalen.return_value = qalen
+            record = PafRecord(qlen=qlen)
+            actual = record.query_coverage
+            mocked_qalen.assert_called_once()
+
+        expected = 1.0
+
+        assert actual == expected
+
+
+class TestTargetCoverage:
+    def test_unmapped_record_returns_zero(self):
+        record = PafRecord(tlen=0)
+
+        actual = record.target_coverage
+        expected = 0.0
+
+        assert actual == expected
+
+    def test_part_of_target_aligned(self):
+        tlen = 10
+        talen = 4
+        patch_target = "pafpy.pafrecord.PafRecord.target_aligned_length"
+        with patch(patch_target, new_callable=PropertyMock) as mocked_talen:
+            mocked_talen.return_value = talen
+            record = PafRecord(tlen=tlen)
+            actual = record.target_coverage
+            mocked_talen.assert_called_once()
+
+        expected = 0.4
+
+        assert actual == expected
+
+    def test_all_of_target_aligned(self):
+        tlen = 10
+        talen = 10
+        patch_target = "pafpy.pafrecord.PafRecord.target_aligned_length"
+        with patch(patch_target, new_callable=PropertyMock) as mocked_talen:
+            mocked_talen.return_value = talen
+            record = PafRecord(tlen=tlen)
+            actual = record.target_coverage
+            mocked_talen.assert_called_once()
+
+        expected = 1.0
 
         assert actual == expected

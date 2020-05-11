@@ -70,7 +70,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.paf import PafRecord
+        from pafpy.pafrecord import PafRecord
 
         line = "query_name\t1239\t65\t1239\t+\ttarget_name\t4378340\t2555250\t2556472\t1139\t1228\t60"
         record = PafRecord.from_str(line)
@@ -78,7 +78,7 @@ class PafRecord(NamedTuple):
         assert record.qname == "query_name"
         assert record.mapq == 60
         ```
-        
+
         ## Errors
         If there are less than the expected number of fields (12), this function will
         raise a `MalformattedRecord` exception.
@@ -106,18 +106,55 @@ class PafRecord(NamedTuple):
         )
 
     @property
-    def query_alignment_length(self) -> int:
+    def query_aligned_length(self) -> int:
         """Length of the aligned query sequence.
 
         This is equal to the absolute value of `qend` - `qstart`.
         """
         return abs(self.qend - self.qstart)
 
+    @property
+    def query_coverage(self) -> float:
+        """Proportion of the query sequence involved in the alignment.
+
+        This is equal to `query_aligned_length` - `qlen`
+
+        ## Example
+        ```py
+        from pafpy.pafrecord import PafRecord
+
+        record = PafRecord(qlen=10, qstart=5, qend=9)
+        assert record.query_coverage == 0.4
+        ```
+        """
+        return 0.0 if self.qlen < 1 else self.query_aligned_length / self.qlen
+
+    @property
+    def target_coverage(self) -> float:
+        """Proportion of the target sequence involved in the alignment.
+
+        This is equal to `target_aligned_length` - `tlen`
+
+        ## Example
+        ```py
+        from pafpy.pafrecord import PafRecord
+
+        record = PafRecord(tlen=10, tstart=5, tend=9)
+        assert record.target_coverage == 0.4
+        ```
+        """
+        return 0.0 if self.tlen < 1 else self.target_aligned_length / self.tlen
+
+    @property
+    def target_aligned_length(self) -> int:
+        """Length of the aligned target sequence.
+
+        This is equal to the absolute value of `tend` - `tstart`.
+        """
+        return abs(self.tend - self.tstart)
+
     # methods to implement
-    # TODO: query coverage - proportion of query sequence involved in alignment
-    # TODO: target coverage - proportion of target sequence involved in alignment
     # TODO: blast identity
-    # TODO: target aligned length
     # TODO: relative length
     # TODO: is_unmapped
     # TODO: is_primary
