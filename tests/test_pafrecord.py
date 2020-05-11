@@ -364,3 +364,29 @@ class TestBlastIdentity:
         expected = 1.0
 
         assert actual == expected
+
+
+class TestIsUnmapped:
+    def test_unmapped_record(self):
+        record = PafRecord()
+
+        assert record.is_unmapped
+
+    def test_mapped_record(self):
+        record = PafRecord(
+            qname="05f868dc-6760-47ec-b7e7-ab4054b0e4fe",
+            qlen=4641,
+            qstart=5,
+            qend=4640,
+            strand=Strand.Reverse,
+            tname="NODE_1_length_4378477_cov_60.093643",
+            tlen=4378340,
+            tstart=1069649,
+            tend=1074329,
+            mlen=4499,
+            blen=4740,
+            mapq=60,
+            tags=["tp:A:P",],
+        )
+
+        assert not record.is_unmapped

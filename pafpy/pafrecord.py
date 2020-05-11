@@ -201,8 +201,18 @@ class PafRecord(NamedTuple):
         except ZeroDivisionError:
             return 0.0
 
+    @property
+    def is_unmapped(self) -> bool:
+        """Is the record unmapped?
+
+        A record is considered unmapped if the strand is '*' - as per the minimap2
+        [`--paf-no-hit`][io-opts] parameter behaviour.
+
+        [io-opts]: https://lh3.github.io/minimap2/minimap2.html#7
+        """
+        return self.strand is Strand.Unmapped
+
     # methods to implement
-    # TODO: is_unmapped
     # TODO: is_primary
     # TODO: is_secondary
     # TODO: is_inversion
