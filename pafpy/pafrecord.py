@@ -178,9 +178,30 @@ class PafRecord(NamedTuple):
         except ZeroDivisionError:
             return 0.0
 
+    def blast_identity(self) -> float:
+        """Calculates the [BLAST identity][blast] for the record.
+
+        BLAST identity is defined as the number of matching bases over the number of
+        alignment columns.
+
+        ## Example
+        ```py
+        from pafpy.pafrecord import PafRecord
+
+        record = PafRecord(
+            mlen=43,  # number of matches
+            blen=50,  # number of alignment columns
+        )
+        assert record.blast_identity() == 0.86
+        ```
+        [blast]: https://lh3.github.io/2018/11/25/on-the-definition-of-sequence-identity#blast-identity
+        """
+        try:
+            return self.mlen / self.blen
+        except ZeroDivisionError:
+            return 0.0
+
     # methods to implement
-    # TODO: blast identity
-    # TODO: relative length
     # TODO: is_unmapped
     # TODO: is_primary
     # TODO: is_secondary

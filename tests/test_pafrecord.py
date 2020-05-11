@@ -330,3 +330,37 @@ class TestRelativeLength:
         expected = 1.0
 
         assert actual == expected
+
+
+class TestBlastIdentity:
+    def test_unmapped_record_returns_zero(self):
+        record = PafRecord()
+
+        actual = record.blast_identity()
+        expected = 0.0
+
+        assert actual == expected
+
+    def test_no_matches_returns_zero(self):
+        record = PafRecord(mlen=0, blen=5)
+
+        actual = record.blast_identity()
+        expected = 0.0
+
+        assert actual == expected
+
+    def test_alignment_block_longer_than_matches(self):
+        record = PafRecord(mlen=4, blen=5)
+
+        actual = record.blast_identity()
+        expected = 0.8
+
+        assert actual == expected
+
+    def test_alignment_block_same_length_as_matches(self):
+        record = PafRecord(mlen=5, blen=5)
+
+        actual = record.blast_identity()
+        expected = 1.0
+
+        assert actual == expected
