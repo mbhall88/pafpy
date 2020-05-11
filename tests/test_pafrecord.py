@@ -370,7 +370,7 @@ class TestIsUnmapped:
     def test_unmapped_record(self):
         record = PafRecord()
 
-        assert record.is_unmapped
+        assert record.is_unmapped()
 
     def test_mapped_record(self):
         record = PafRecord(
@@ -386,7 +386,14 @@ class TestIsUnmapped:
             mlen=4499,
             blen=4740,
             mapq=60,
-            tags=["tp:A:P",],
+            tags=["tp:A:P"],
         )
 
-        assert not record.is_unmapped
+        assert not record.is_unmapped()
+
+
+class TestIsPrimary:
+    def test_unmapped_record(self):
+        record = PafRecord()
+
+        assert not record.is_primary()

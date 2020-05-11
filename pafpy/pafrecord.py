@@ -201,7 +201,6 @@ class PafRecord(NamedTuple):
         except ZeroDivisionError:
             return 0.0
 
-    @property
     def is_unmapped(self) -> bool:
         """Is the record unmapped?
 
@@ -211,6 +210,9 @@ class PafRecord(NamedTuple):
         [io-opts]: https://lh3.github.io/minimap2/minimap2.html#7
         """
         return self.strand is Strand.Unmapped
+
+    def is_primary(self) -> bool:
+        return True
 
     # methods to implement
     # TODO: is_primary
