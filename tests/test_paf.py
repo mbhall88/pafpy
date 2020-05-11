@@ -1,9 +1,10 @@
 import pytest
 
-from pafpy.paf import PafRecord, Strand, MalformattedRecord, DELIM
+from pafpy.pafrecord import PafRecord, MalformattedRecord, DELIM
+from pafpy.strand import Strand
 
 
-class TestPafRecordStr:
+class TestStr:
     def test_no_tags(self):
         record = PafRecord()
 
@@ -30,7 +31,7 @@ class TestPafRecordStr:
         assert actual == expected
 
 
-class TestPafRecordFromStr:
+class TestFromStr:
     def test_empty_str_raises_error(self):
         line = ""
 
@@ -114,5 +115,31 @@ class TestPafRecordFromStr:
             60,
             ["NM:i:89", "ms:i:1906"],
         )
+
+        assert actual == expected
+
+
+class TestQueryAlignedLength:
+    def test_unmapped_record_returns_zero(self):
+        record = PafRecord()
+
+        actual = record.query_alignment_length
+        expected = 0
+
+        assert actual == expected
+
+    def test_qend_greater_than_qstart(self):
+        record = PafRecord(qstart=2, qend=5)
+
+        actual = record.query_alignment_length
+        expected = 3
+
+        assert actual == expected
+
+    def test_qend_less_than_qstart(self):
+        record = PafRecord(qstart=5, qend=2)
+
+        actual = record.query_alignment_length
+        expected = 3
 
         assert actual == expected

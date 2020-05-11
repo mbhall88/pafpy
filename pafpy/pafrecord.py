@@ -1,5 +1,6 @@
-from enum import Enum
 from typing import NamedTuple, List, Optional
+
+from pafpy.strand import Strand
 
 DELIM = "\t"
 MIN_FIELDS = 12
@@ -7,14 +8,6 @@ MIN_FIELDS = 12
 
 class MalformattedRecord(Exception):
     pass
-
-
-class Strand(Enum):
-    Forward = "+"
-    Reverse = "-"
-
-    def __str__(self) -> str:
-        return str(self.value)
 
 
 class PafRecord(NamedTuple):
@@ -25,30 +18,29 @@ class PafRecord(NamedTuple):
     [paf]: https://github.com/lh3/miniasm/blob/master/PAF.md
     """
 
-    qname: str = ""
+    qname: str = "*"
     """Query sequence name."""
-    qlen: int = -1
+    qlen: int = 0
     """Query sequence length."""
-    qstart: int = -1
+    qstart: int = 0
     """Query start (0-based; BED-like; closed)."""
-    qend: int = -1
+    qend: int = 0
     """Query end (0-based; BED-like; open)."""
-    strand: Strand = Strand.Forward
-    """Relative strand: "+" or "-"."""
-    tname: str = ""
+    strand: Strand = Strand.Unmapped
+    """‘+’ if query/target on the same strand; ‘-’ if opposite; '*' if unmapped."""
+    tname: str = "*"
     """Target sequence name."""
-    tlen: int = -1
+    tlen: int = 0
     """Target sequence length."""
-    tstart: int = -1
+    tstart: int = 0
     """Target start on original strand (0-based)."""
-    tend: int = -1
+    tend: int = 0
     """Target end on original strand (0-based)."""
-    mlen: int = -1
-    """Number of residue matches."""
-    blen: int = -1
-    """Alignment block length, including both alignment matches and gaps but excluding 
-    ambiguous bases."""
-    mapq: int = -1
+    mlen: int = 0
+    """Number of matching bases in the mapping."""
+    blen: int = 0
+    """Alignment block length. Number of bases, including gaps, in the mapping."""
+    mapq: int = 0
     """Mapping quality (0-255; 255 for missing)."""
     tags: Optional[List[str]] = None
     """[SAM-like optional fields (tags)](https://samtools.github.io/hts-specs/SAMtags.pdf)."""
@@ -112,3 +104,22 @@ class PafRecord(NamedTuple):
             mapq=int(fields[11]),
             tags=fields[12::],
         )
+
+    @property
+    def query_alignment_length(self) -> int:
+        """Length of the aligned query sequence.
+
+        This is equal to the absolute value of `qend` - `qstart`.
+        """
+        return abs(self.qend - self.qstart)
+
+    # methods to implement
+    # TODO: query coverage - proportion of query sequence involved in alignment
+    # TODO: target coverage - proportion of target sequence involved in alignment
+    # TODO: blast identity
+    # TODO: target aligned length
+    # TODO: relative length
+    # TODO: is_unmapped
+    # TODO: is_primary
+    # TODO: is_secondary
+    # TODO: is_inversion
