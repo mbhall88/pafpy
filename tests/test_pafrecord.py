@@ -5,6 +5,7 @@ import pytest
 
 from pafpy.pafrecord import PafRecord, MalformattedRecord, DELIM
 from pafpy.strand import Strand
+from pafpy.tag import Tag, InvalidTagFormat
 
 
 class TestStr:
@@ -19,7 +20,7 @@ class TestStr:
         assert actual == expected
 
     def test_with_tags(self):
-        tags = ["NM:i:1", "ms:i:1906"]
+        tags = {"NM": Tag.from_str("NM:i:1"), "ms": Tag.from_str("ms:i:1906")}
         record = PafRecord(tags=tags)
 
         actual = str(record)
@@ -78,10 +79,31 @@ class TestFromStr:
             1139,
             1228,
             60,
-            [],
+            {},
         )
 
         assert actual == expected
+
+    def test_line_with_invalid_tag_raises_error(self):
+        fields = [
+            "query_name",
+            "1239",
+            "65",
+            "1239",
+            "-",
+            "target_name",
+            "4378340",
+            "2555250",
+            "2556472",
+            "1139",
+            "1228",
+            "60",
+            "NMX:i:89",
+        ]
+        line = "\t".join(fields)
+
+        with pytest.raises(InvalidTagFormat):
+            PafRecord.from_str(line)
 
     def test_line_with_tags(self):
         fields = [
@@ -103,6 +125,7 @@ class TestFromStr:
         line = "\t".join(fields)
 
         actual = PafRecord.from_str(line)
+        tags = {"NM": Tag.from_str("NM:i:89"), "ms": Tag.from_str("ms:i:1906")}
         expected = PafRecord(
             "query_name",
             1239,
@@ -116,7 +139,46 @@ class TestFromStr:
             1139,
             1228,
             60,
-            ["NM:i:89", "ms:i:1906"],
+            tags,
+        )
+
+        assert actual == expected
+
+    def test_line_with_dupliacte_tag_returns_last_one(self):
+        fields = [
+            "query_name",
+            "1239",
+            "65",
+            "1239",
+            "-",
+            "target_name",
+            "4378340",
+            "2555250",
+            "2556472",
+            "1139",
+            "1228",
+            "60",
+            "NM:i:89",
+            "NM:i:2",
+        ]
+        line = "\t".join(fields)
+
+        actual = PafRecord.from_str(line)
+        expected_tags = {"NM": Tag.from_str("NM:i:2")}
+        expected = PafRecord(
+            "query_name",
+            1239,
+            65,
+            1239,
+            Strand.Reverse,
+            "target_name",
+            4378340,
+            2555250,
+            2556472,
+            1139,
+            1228,
+            60,
+            expected_tags,
         )
 
         assert actual == expected
@@ -386,10 +448,41 @@ class TestIsUnmapped:
             mlen=4499,
             blen=4740,
             mapq=60,
-            tags=["tp:A:P"],
+            tags={"tp": Tag.from_str("tp:A:P")},
         )
 
         assert not record.is_unmapped()
+
+
+class TestGetTag:
+    def test_no_tags_returns_default(self):
+        record = PafRecord()
+        tag = "NM"
+
+        actual = record.get_tag(tag)
+
+        assert actual is None
+
+    def test_tag_not_present_returns_default(self):
+        tags = {"de": Tag.from_str("de:f:0.1")}
+        record = PafRecord(tags=tags)
+        tag = "NM"
+        default = Tag.from_str("NM:i:0")
+
+        actual = record.get_tag(tag, default=default)
+        expected = default
+
+        assert actual == expected
+
+    def test_tag_present(self):
+        expected = Tag.from_str("de:f:0.1")
+        tags = {"de": expected}
+        record = PafRecord(tags=tags)
+        tag = "de"
+
+        actual = record.get_tag(tag)
+
+        assert actual == expected
 
 
 class TestIsPrimary:

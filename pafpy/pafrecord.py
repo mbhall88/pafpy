@@ -1,6 +1,9 @@
-from typing import NamedTuple, List, Optional
+from typing import NamedTuple, List, Optional, Dict
 
 from pafpy.strand import Strand
+from pafpy.tag import Tag
+
+Tags = Dict[str, Tag]
 
 DELIM = "\t"
 MIN_FIELDS = 12
@@ -42,7 +45,7 @@ class PafRecord(NamedTuple):
     """Alignment block length. Number of bases, including gaps, in the mapping."""
     mapq: int = 0
     """Mapping quality (0-255; 255 for missing)."""
-    tags: Optional[List[str]] = None
+    tags: Optional[Tags] = None
     """[SAM-like optional fields (tags)](https://samtools.github.io/hts-specs/SAMtags.pdf)."""
 
     def __str__(self) -> str:
@@ -68,6 +71,8 @@ class PafRecord(NamedTuple):
     def from_str(line: str) -> "PafRecord":
         """Construct a `PafRecord` from a string.
 
+        Note: If there are duplicate SAM-like tags, only the last one will be retained.
+
         ## Example
         ```py
         from pafpy.pafrecord import PafRecord
@@ -80,14 +85,19 @@ class PafRecord(NamedTuple):
         ```
 
         ## Errors
-        If there are less than the expected number of fields (12), this function will
+        - If there are less than the expected number of fields (12), this function will
         raise a `MalformattedRecord` exception.
+        - If there is an invalid tag, an `InvalidTagFormat` exception will be raised.
         """
         fields = line.rstrip().split(DELIM)
         if len(fields) < MIN_FIELDS:
             raise MalformattedRecord(
                 f"Expected {MIN_FIELDS} fields, but got {len(fields)}\n{line}"
             )
+        tags: Tags = dict()
+        for tag_str in fields[12:]:
+            tag = Tag.from_str(tag_str)
+            tags[tag.tag] = tag
 
         return PafRecord(
             qname=fields[0],
@@ -102,7 +112,7 @@ class PafRecord(NamedTuple):
             mlen=int(fields[9]),
             blen=int(fields[10]),
             mapq=int(fields[11]),
-            tags=fields[12::],
+            tags=tags,
         )
 
     @property
@@ -212,7 +222,38 @@ class PafRecord(NamedTuple):
         return self.strand is Strand.Unmapped
 
     def is_primary(self) -> bool:
-        return True
+        pass
+
+    def get_tag(self, tag: str, default: Optional[Tag] = None) -> Optional[Tag]:
+        """Retreive a tag from the record if it is present. Otherwise, return `default`.
+
+        If `default` is not specified, `None` will be used as the default.
+
+        ## Example
+        ```py
+        from pafpy.tag import Tag
+        from pafpy.pafrecord import PafRecord
+
+        # tag is present
+        expected = Tag.from_str("de:f:0.1")
+        tags = {"de": expected}
+        record = PafRecord(tags=tags)
+        tag = "de"
+
+        actual = record.get_tag(tag)
+
+        assert actual == expected
+
+        # tag is not present, returns default
+        tag = "NM"
+        default = Tag.from_str("NM:i:0")
+
+        actual = record.get_tag(tag, default=default)
+
+        assert actual == default
+        ```
+        """
+        return default if self.tags is None else self.tags.get(tag, default)
 
     # methods to implement
     # TODO: is_primary

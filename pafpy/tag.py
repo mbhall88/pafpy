@@ -29,7 +29,7 @@ class Tag(NamedTuple):
 
     ## Example
     ```py
-    from pafpy.tags import Tag
+    from pafpy.tag import Tag
 
     tag = Tag(tag="NM", type="i", value=50)
     assert str(tag) == "NM:i:50"
@@ -52,7 +52,7 @@ class Tag(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.tags import Tag
+        from pafpy.tag import Tag
 
         string = "NM:i:50"
         tag = Tag.from_str(string)
