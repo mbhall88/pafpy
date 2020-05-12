@@ -1,11 +1,11 @@
 from contextlib import ExitStack
-from unittest.mock import patch, PropertyMock
+from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from pafpy.pafrecord import PafRecord, MalformattedRecord, DELIM
+from pafpy.pafrecord import DELIM, MalformattedRecord, PafRecord
 from pafpy.strand import Strand
-from pafpy.tag import Tag, InvalidTagFormat
+from pafpy.tag import InvalidTagFormat, Tag
 
 
 class TestStr:

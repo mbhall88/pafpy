@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import NamedTuple, Optional, Dict
+from typing import Dict, NamedTuple, Optional
 
 from pafpy.strand import Strand
 from pafpy.tag import Tag
@@ -91,7 +91,7 @@ class PafRecord(NamedTuple):
         ```py
         from pafpy.pafrecord import PafRecord
 
-        line = "query_name\t1239\t65\t1239\t+\ttarget_name\t4378340\t2555250\t2556472\t1139\t1228\t60"
+        line = "query_name\t123\t65\t123\t+\ttname\t43783\t25552\t25564\t1139\t1228\t60"
         record = PafRecord.from_str(line)
 
         assert record.qname == "query_name"

@@ -6,7 +6,7 @@ The full specifications can he found [here][specs].
 """
 import re
 from enum import Enum
-from typing import NamedTuple, Union, Type, Pattern, Set
+from typing import NamedTuple, Pattern, Set, Type, Union
 
 DELIM = ":"
 

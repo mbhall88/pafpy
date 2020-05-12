@@ -1,6 +1,6 @@
 import pytest
 
-from pafpy.tag import Tag, InvalidTagFormat, TagTypes, UnknownTagTypeChar
+from pafpy.tag import InvalidTagFormat, Tag, TagTypes, UnknownTagTypeChar
 
 
 class TestStr:
