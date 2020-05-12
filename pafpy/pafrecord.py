@@ -309,6 +309,38 @@ class PafRecord(NamedTuple):
 
         return aln_type is AlignmentType.Secondary
 
+    def is_inversion(self) -> bool:
+        """Is the alignment an inversion?
+
+        This is determined from the ['tp' tag][mm2-tags]. For more information about
+        inversions (from minimap2) refer to the [minimap2 alignment options][aln-opts].
+
+        ## Example
+        ```py
+        from pafpy.pafrecord import PafRecord
+        from pafpy.tag import Tag
+        from pafpy.strand import Strand
+
+        tag = Tag.from_str("tp:A:I")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+        assert record.is_inversion()
+        ```
+
+        ## Errors
+        If the value in the 'tp' tag is unknown, a `ValueError` exception will be
+        raised.
+
+        [mm2-tags]: https://lh3.github.io/minimap2/minimap2.html#10
+        [aln-opts]: https://lh3.github.io/minimap2/minimap2.html#6
+        """
+        if self.is_unmapped():
+            return False
+
+        aln_tag = self.get_tag("tp", default=Tag.from_str("tp:A:*"))
+        aln_type = AlignmentType(aln_tag.value[0].upper())
+
+        return aln_type is AlignmentType.Inversion
+
     def get_tag(self, tag: str, default: Optional[Tag] = None) -> Optional[Tag]:
         """Retreive a tag from the record if it is present. Otherwise, return `default`.
 
@@ -339,7 +371,3 @@ class PafRecord(NamedTuple):
         ```
         """
         return default if self.tags is None else self.tags.get(tag, default)
-
-    # methods to implement
-    # TODO: is_secondary
-    # TODO: is_inversion

@@ -537,3 +537,33 @@ class TestIsSecondary:
         tag = Tag.from_str("tp:A:?")
         with pytest.raises(ValueError):
             PafRecord(strand=Strand.Forward, tags={tag.tag: tag}).is_secondary()
+
+
+class TestIsInversion:
+    def test_unmapped_record(self):
+        record = PafRecord()
+
+        assert not record.is_inversion()
+
+    def test_primary_record_returns_false(self):
+        tag = Tag.from_str("tp:A:P")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+
+        assert not record.is_inversion()
+
+    def test_inversion_returns_true(self):
+        tag = Tag.from_str("tp:A:I")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+
+        assert record.is_inversion()
+
+    def test_lower_case_inversion_returns_true(self):
+        tag = Tag.from_str("tp:A:i")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+
+        assert record.is_inversion()
+
+    def test_unknown_char_raises_error(self):
+        tag = Tag.from_str("tp:A:?")
+        with pytest.raises(ValueError):
+            PafRecord(strand=Strand.Forward, tags={tag.tag: tag}).is_inversion()
