@@ -509,3 +509,31 @@ class TestIsPrimary:
             PafRecord(strand=Strand.Forward, tags={tag.tag: tag}).is_primary()
 
 
+class TestIsSecondary:
+    def test_unmapped_record(self):
+        record = PafRecord()
+
+        assert not record.is_secondary()
+
+    def test_primary_record_returns_false(self):
+        tag = Tag.from_str("tp:A:P")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+
+        assert not record.is_secondary()
+
+    def test_secondary_returns_true(self):
+        tag = Tag.from_str("tp:A:S")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+
+        assert record.is_secondary()
+
+    def test_lower_case_secondary_returns_true(self):
+        tag = Tag.from_str("tp:A:s")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+
+        assert record.is_secondary()
+
+    def test_unknown_char_raises_error(self):
+        tag = Tag.from_str("tp:A:?")
+        with pytest.raises(ValueError):
+            PafRecord(strand=Strand.Forward, tags={tag.tag: tag}).is_secondary()

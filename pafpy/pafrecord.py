@@ -276,6 +276,39 @@ class PafRecord(NamedTuple):
 
         return aln_type is AlignmentType.Primary
 
+    def is_secondary(self) -> bool:
+        """Is the record a secondary alignment?
+
+        This is determined from the ['tp' tag][mm2-tags].
+
+        *Note: Supplementary alignments will return `False` as they are considered
+        primary.*
+
+        ## Example
+        ```py
+        from pafpy.pafrecord import PafRecord
+        from pafpy.tag import Tag
+        from pafpy.strand import Strand
+
+        tag = Tag.from_str("tp:A:S")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+        assert record.is_secondary()
+        ```
+
+        ## Errors
+        If the value in the 'tp' tag is unknown, a `ValueError` exception will be
+        raised.
+
+        [mm2-tags]: https://lh3.github.io/minimap2/minimap2.html#10
+        """
+        if self.is_unmapped():
+            return False
+
+        aln_tag = self.get_tag("tp", default=Tag.from_str("tp:A:*"))
+        aln_type = AlignmentType(aln_tag.value[0].upper())
+
+        return aln_type is AlignmentType.Secondary
+
     def get_tag(self, tag: str, default: Optional[Tag] = None) -> Optional[Tag]:
         """Retreive a tag from the record if it is present. Otherwise, return `default`.
 
