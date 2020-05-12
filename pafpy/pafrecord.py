@@ -1,3 +1,11 @@
+"""
+TODO: write docs here
+TODO: figure out how to setup "convenient" importing
+i.e. from pafpy import PafRecord
+rather than from pafpy.pafrecord import PafRecord
+TODO: docstring tests
+TODO: implement PafFile
+"""
 from enum import Enum
 from typing import Dict, NamedTuple, Optional
 
@@ -30,7 +38,40 @@ class AlignmentType(Enum):
 class PafRecord(NamedTuple):
     """A single entry (row) in a [PAF][paf] file.
 
-    TODO add examples
+    There are two ways to construct a `PafRecord`:
+    
+    1. The default constructor, where you specify each member variable by hand.
+    2. Using the `from_str` factory method.
+
+    ## Example
+    ```py
+    from pafpy.pafrecord import PafRecord
+    from pafpy.strand import Strand
+    from pafpy.tag import Tag
+
+    # default constructor
+    record1 = PafRecord(
+            qname="query_name",
+            qlen=1239,
+            qstart=65,
+            qend=1239,
+            strand=Strand.Forward,
+            tname="target_name",
+            tlen=4378340,
+            tstart=2555250,
+            tend=2556472,
+            mlen=1139,
+            blen=1228,
+            mapq=60,
+            tags={"NM": Tag.from_str("NM:i:8")},
+    )
+
+    # from_str factory constructor
+    line = "query_name\t1239\t65\t1239\t+\ttarget_name\t4378340\t2555250\t2556472\t1139\t1228\t60\tNM:i:8"
+    record2 = PafRecord.from_str(line)
+
+    assert record1 == record2
+    ```
 
     [paf]: https://github.com/lh3/miniasm/blob/master/PAF.md
     """
