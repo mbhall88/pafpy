@@ -1,4 +1,5 @@
-from typing import NamedTuple, List, Optional, Dict
+from enum import Enum
+from typing import NamedTuple, Optional, Dict
 
 from pafpy.strand import Strand
 from pafpy.tag import Tag
@@ -10,7 +11,20 @@ MIN_FIELDS = 12
 
 
 class MalformattedRecord(Exception):
+    """An exception indicating that a `PafRecord` is not in the expected format."""
+
     pass
+
+
+class AlignmentType(Enum):
+    """An enum for storing mappings between the value in the tp tag and the type of
+    alignment this value indicates.
+    """
+
+    Primary = "P"
+    Secondary = "S"
+    Inversion = "I"
+    Unknown = "*"
 
 
 class PafRecord(NamedTuple):
@@ -217,12 +231,50 @@ class PafRecord(NamedTuple):
         A record is considered unmapped if the strand is '*' - as per the minimap2
         [`--paf-no-hit`][io-opts] parameter behaviour.
 
+        ## Example
+        ```py
+        from pafpy.strand import Strand
+        from pafpy.pafrecord import PafRecord
+
+        record = PafRecord(strand=Strand("*"))
+        assert record.is_unmapped()
+        ```
+
         [io-opts]: https://lh3.github.io/minimap2/minimap2.html#7
         """
         return self.strand is Strand.Unmapped
 
     def is_primary(self) -> bool:
-        pass
+        """Is the record a primary alignment?
+
+        This is determined from the ['tp' tag][mm2-tags].
+
+        *Note: Supplementary alignments will also return `True`.*
+
+        ## Example
+        ```py
+        from pafpy.pafrecord import PafRecord
+        from pafpy.tag import Tag
+        from pafpy.strand import Strand
+
+        tag = Tag.from_str("tp:A:P")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+        assert record.is_primary()
+        ```
+
+        ## Errors
+        If the value in the 'tp' tag is unknown, a `ValueError` exception will be
+        raised.
+
+        [mm2-tags]: https://lh3.github.io/minimap2/minimap2.html#10
+        """
+        if self.is_unmapped():
+            return False
+
+        aln_tag = self.get_tag("tp", default=Tag.from_str("tp:A:*"))
+        aln_type = AlignmentType(aln_tag.value[0].upper())
+
+        return aln_type is AlignmentType.Primary
 
     def get_tag(self, tag: str, default: Optional[Tag] = None) -> Optional[Tag]:
         """Retreive a tag from the record if it is present. Otherwise, return `default`.
@@ -256,6 +308,5 @@ class PafRecord(NamedTuple):
         return default if self.tags is None else self.tags.get(tag, default)
 
     # methods to implement
-    # TODO: is_primary
     # TODO: is_secondary
     # TODO: is_inversion

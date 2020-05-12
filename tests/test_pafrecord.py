@@ -1,5 +1,5 @@
-from unittest.mock import patch, PropertyMock
 from contextlib import ExitStack
+from unittest.mock import patch, PropertyMock
 
 import pytest
 
@@ -490,3 +490,22 @@ class TestIsPrimary:
         record = PafRecord()
 
         assert not record.is_primary()
+
+    def test_primary_record_returns_true(self):
+        tag = Tag.from_str("tp:A:P")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+
+        assert record.is_primary()
+
+    def test_lower_case_primary_returns_true(self):
+        tag = Tag.from_str("tp:A:p")
+        record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
+
+        assert record.is_primary()
+
+    def test_unknown_char_raises_error(self):
+        tag = Tag.from_str("tp:A:?")
+        with pytest.raises(ValueError):
+            PafRecord(strand=Strand.Forward, tags={tag.tag: tag}).is_primary()
+
+
