@@ -22,9 +22,16 @@ lint:
 # BUILD ########################################################################
 
 # TEST ########################################################################
-.PHONY: test
-test:
+.PHONY: test-code
+test-code:
 	poetry run pytest tests/
+
+.PHONY: test-docs
+test-docs:
+	poetry run scripts/mkpydoctest -o tests/test_docs.py pafpy/
+
+.PHONY: test
+test: test-code test-docs
 
 .PHONY: coverage
 coverage:

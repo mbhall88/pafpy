@@ -52,7 +52,7 @@ class TagTypes(Enum):
     from pafpy import TagType, TagTypes
 
     tag_type = TagTypes.from_char("i")
-    assert tag_type == TagType.Integer
+    assert tag_type == TagTypes.Integer
     ```
 
     ## Errors
@@ -89,7 +89,7 @@ class TagTypes(Enum):
         from pafpy import TagType, TagTypes
 
         tag_type = TagTypes.from_char("i")
-        assert tag_type == TagType.Integer
+        assert tag_type == TagTypes.Integer
         ```
 
         ## Errors

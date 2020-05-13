@@ -1,0 +1,268 @@
+#!/usr/bin/env python3
+
+import logging
+import re
+import sys
+from pathlib import Path
+from typing import Iterator, List, Pattern, Set, Union
+
+import click
+import pytest
+from black import get_gitignore
+from pathspec import PathSpec
+
+PathLike = Union[Path, str]
+DEFAULT_EXCLUDES = (
+    r"(\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.tox|\.venv|\.svn|_build|buck-out|"
+    r"build|dist)"
+)
+DEFAULT_INCLUDES = r"\.pyi?$"
+
+
+class InvalidRegularExpression(Exception):
+    pass
+
+
+def construct_regex(regex: str) -> Pattern[str]:
+    return (
+        re.compile(regex, re.VERBOSE | re.MULTILINE)
+        if "\n" in regex
+        else re.compile(regex)
+    )
+
+
+def generate_test_function_name(line_num: int, filename: str) -> str:
+    return f"def test_code_block_starting_at_line_{line_num}_in_{filename}():"
+
+
+def get_valid_files_in_dir(
+    path: Path,
+    root: Path,
+    include: Pattern[str],
+    exclude: Pattern[str],
+    gitignore: PathSpec,
+) -> Iterator[Path]:
+    """Generate all files under `path` whose paths are not excluded by the
+    `exclude` regex, but are included by the `include` regex.
+    Symbolic links pointing outside of the `root` directory are ignored.
+    `report` is where output about exclusions goes.
+    Adapted from
+    https://github.com/psf/black/blob/ce14fa8b497bae2b50ec48b3bd7022573a59cdb1/black.py#L3519-L3573
+    """
+    root = root.resolve()
+
+    for child in path.iterdir():
+        # First ignore files matching .gitignore
+        if gitignore.match_file(child.as_posix()):
+            logging.debug(f"Ignoring: {child} matches .gitignore file content")
+            continue
+
+        # Then ignore with `exclude` option.
+        try:
+            normalized_path = str(child.resolve())
+        except OSError as err:
+            logging.debug(f"Ignoring: {child} cannot be read because {err}.")
+            continue
+        except ValueError as err:
+            if child.is_symlink():
+                logging.debug(
+                    f"Ignoring: {child} is a symbolic link that points outside {root}"
+                )
+                continue
+            logging.error(f"{child} caused error")
+            raise ValueError(err)
+
+        exclude_match = exclude.search(normalized_path)
+        if exclude_match and exclude_match.group(0):
+            logging.debug(f"Excluded: {child} matched the --exclude regular expression")
+            continue
+
+        if child.is_dir():
+            yield from get_valid_files_in_dir(child, root, include, exclude, gitignore)
+
+        elif child.is_file():
+            include_match = include.search(child.name)
+            if include_match:
+                logging.debug(
+                    f"Included: {child} matched the --include regular expression"
+                )
+                yield child
+            else:
+                logging.debug(
+                    f"Ignoring: {child} did not match the --include regular expression"
+                )
+
+
+def create_tests_for_code_blocks(code: str, filename: str) -> str:
+    """Function that extracts all python markdown-fenced code blocks in a file and
+    creates a test function for each snippet. Returns a string containing all the
+    tests.
+    """
+    lines = code.splitlines()
+    test_code = ""
+    inside_code = False
+    for line_num, line in enumerate(map(str.strip, lines)):
+        if line.startswith("```py"):
+            inside_code = True
+            test_code += generate_test_function_name(line_num, filename) + "\n"
+            continue
+        if line.startswith("```") and inside_code:
+            test_code += "\n"
+            inside_code = False
+            continue
+        elif line.startswith("```"):
+            raise SyntaxError(
+                f"Detected unbalanced open/close of code block in line {line_num}"
+            )
+        if inside_code:
+            test_code += f"    {line}\n"
+
+    return test_code
+
+
+@click.command()
+@click.option(
+    "--include",
+    type=str,
+    metavar="PATTERN",
+    default=DEFAULT_INCLUDES,
+    help=(
+        "A regular expression that matches files and directories that should be "
+        "included on recursive searches. An empty value means all files are "
+        "included regardless of the name. Use forward slashes for directories on "
+        "all platforms (Windows, too). Exclusions are calculated first, "
+        "inclusions later."
+    ),
+    show_default=True,
+)
+@click.option(
+    "--exclude",
+    type=str,
+    metavar="PATTERN",
+    default=DEFAULT_EXCLUDES,
+    help=(
+        "A regular expression that matches files and directories that should be "
+        "excluded on recursive searches.  An empty value means no paths are "
+        "excluded. Use forward slashes for directories on all platforms (Windows, "
+        "too). Exclusions are calculated first, inclusions later."
+    ),
+    show_default=True,
+)
+@click.option(
+    "-o",
+    "--output",
+    help="Name of the output test file. Default is to stdout.",
+    type=click.Path(dir_okay=False, resolve_path=True, writable=True, allow_dash=True),
+    default="-",
+)
+@click.argument(
+    "src",
+    nargs=-1,
+    type=click.Path(
+        exists=True, file_okay=True, dir_okay=True, readable=True, allow_dash=True
+    ),
+)
+@click.help_option("--help", "-h")
+@click.option("-v", "--verbose", help="Turns on debug-level logging.", is_flag=True)
+@click.pass_context
+def main(
+    ctx: click.Context,
+    include: str,
+    exclude: str,
+    src: List[PathLike],
+    output: PathLike,
+    verbose: bool,
+):
+    """A script that will extract python code from  markdown-style code blocks. The
+     code blocks must be annotated with 'py' or 'python'. The resulting output will
+     be a python file containing a unit test function for each code block. The output
+     file can then be input into pytest.
+     """
+    log_level = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(format="[%(levelname)s] %(message)s", level=log_level)
+
+    if output == "-":
+        outstream = sys.stdout
+    else:
+        outstream = Path(output).open("w")
+
+    if not src:
+        click.echo("No path provided. Nothing to do 😴", err=True)
+        ctx.exit(0)
+
+    if "-" in src and len(src) > 1:
+        raise click.BadArgumentUsage("Cannot mix stdin (-) with other files")
+
+    try:
+        include_regex = construct_regex(include)
+    except re.error:
+        raise InvalidRegularExpression(
+            f"Invalid regular expression for --include given: {include!r}"
+        )
+
+    try:
+        exclude_regex = construct_regex(exclude)
+    except re.error:
+        raise InvalidRegularExpression(
+            f"Invalid regular expression for --exclude given: {exclude!r}"
+        )
+
+    files_to_extract_doctests_from: Set[Path] = set()
+    root = Path()
+    gitignore = get_gitignore(Path())
+    for path in src:
+        path = Path(path)
+        if path.name == "-" or path.is_file():
+            # if a file was explicitly given, we don't care about its extension
+            files_to_extract_doctests_from.add(path)
+        elif path.is_dir():
+            files_to_extract_doctests_from.update(
+                get_valid_files_in_dir(
+                    path, root, include_regex, exclude_regex, gitignore
+                )
+            )
+        else:
+            logging.warning(f"ignoring invalid path: {path}")
+
+    print(
+        '"""This file contains unit tests for code blocks scraped from the markdown \n'
+        "python code blocks in files provided to the script that generated this file.\n"
+        '"""',
+        file=outstream,
+    )
+
+    for path in files_to_extract_doctests_from:
+        path_is_stdin = path.name == "-"
+        if path_is_stdin:
+            logging.debug("Formatting from stdin")
+            print("#" * 30, file=outstream)
+            print("# TESTS FOR: stdin", file=outstream)
+            print("#" * 30, file=outstream)
+            path = sys.stdin
+        else:
+            print("#" * 30, file=outstream)
+            print(f"# TESTS FOR: {path}", file=outstream)
+            print("#" * 30, file=outstream)
+            logging.debug(f"Formatting {path}")
+
+        try:
+            code = path.read_text()
+        except AttributeError:
+            code = path.read()
+
+        test_code = create_tests_for_code_blocks(code, path.stem)
+        print(test_code, file=outstream)
+
+    outstream.close()
+    if output != "-":
+        logging.info(f"Test file written to {output}")
+        logging.info("Running pytest on the test file...")
+        pytest.main([output])
+    else:
+        logging.info("Not running pytest as output is to stdout.")
+
+    logging.info("All done 🎉")
+
+
+if __name__ == "__main__":
+    main()
