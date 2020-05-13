@@ -49,7 +49,7 @@ class TagTypes(Enum):
 
     ## Example
     ```py
-    from pafpy.tag import TagType, TagTypes
+    from pafpy import TagType, TagTypes
 
     tag_type = TagTypes.from_char("i")
     assert tag_type == TagType.Integer
@@ -86,7 +86,7 @@ class TagTypes(Enum):
 
         ## Example
         ```py
-        from pafpy.tag import TagType, TagTypes
+        from pafpy import TagType, TagTypes
 
         tag_type = TagTypes.from_char("i")
         assert tag_type == TagType.Integer
@@ -109,7 +109,7 @@ class Tag(NamedTuple):
 
     ## Example
     ```py
-    from pafpy.tag import Tag
+    from pafpy import Tag
 
     tag = Tag(tag="NM", type="i", value=50)
     assert str(tag) == "NM:i:50"
@@ -132,7 +132,7 @@ class Tag(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.tag import Tag
+        from pafpy import Tag
 
         string = "NM:i:50"
         tag = Tag.from_str(string)

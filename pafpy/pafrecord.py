@@ -1,8 +1,5 @@
 """
 TODO: write docs here
-TODO: figure out how to setup "convenient" importing
-i.e. from pafpy import PafRecord
-rather than from pafpy.pafrecord import PafRecord
 TODO: docstring tests
 TODO: implement PafFile
 """
@@ -45,9 +42,7 @@ class PafRecord(NamedTuple):
 
     ## Example
     ```py
-    from pafpy.pafrecord import PafRecord
-    from pafpy.strand import Strand
-    from pafpy.tag import Tag
+    from pafpy import PafRecord, Strand, Tag
 
     # default constructor
     record1 = PafRecord(
@@ -130,7 +125,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.pafrecord import PafRecord
+        from pafpy import PafRecord
 
         line = "query_name\t123\t65\t123\t+\ttname\t43783\t25552\t25564\t1139\t1228\t60"
         record = PafRecord.from_str(line)
@@ -186,7 +181,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.pafrecord import PafRecord
+        from pafpy import PafRecord
 
         record = PafRecord(qlen=10, qstart=5, qend=9)
         assert record.query_coverage == 0.4
@@ -205,7 +200,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.pafrecord import PafRecord
+        from pafpy import PafRecord
 
         record = PafRecord(tlen=10, tstart=5, tend=9)
         assert record.target_coverage == 0.4
@@ -232,7 +227,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.pafrecord import PafRecord
+        from pafpy import PafRecord
 
         record = PafRecord(qlen=50, qstart=10, qend=20, tlen=100, tstart=50, tend=90)
         assert record.relative_length == 0.25
@@ -251,7 +246,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.pafrecord import PafRecord
+        from pafpy import PafRecord
 
         record = PafRecord(
             mlen=43,  # number of matches
@@ -274,8 +269,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.strand import Strand
-        from pafpy.pafrecord import PafRecord
+        from pafpy import PafRecord, Strand
 
         record = PafRecord(strand=Strand("*"))
         assert record.is_unmapped()
@@ -294,9 +288,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.pafrecord import PafRecord
-        from pafpy.tag import Tag
-        from pafpy.strand import Strand
+        from pafpy import PafRecord, Strand, Tag
 
         tag = Tag.from_str("tp:A:P")
         record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
@@ -327,9 +319,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.pafrecord import PafRecord
-        from pafpy.tag import Tag
-        from pafpy.strand import Strand
+        from pafpy import PafRecord, Strand, Tag
 
         tag = Tag.from_str("tp:A:S")
         record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
@@ -358,9 +348,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.pafrecord import PafRecord
-        from pafpy.tag import Tag
-        from pafpy.strand import Strand
+        from pafpy import PafRecord, Strand, Tag
 
         tag = Tag.from_str("tp:A:I")
         record = PafRecord(strand=Strand.Forward, tags={tag.tag: tag})
@@ -389,8 +377,7 @@ class PafRecord(NamedTuple):
 
         ## Example
         ```py
-        from pafpy.tag import Tag
-        from pafpy.pafrecord import PafRecord
+        from pafpy import PafRecord, Tag
 
         # tag is present
         expected = Tag.from_str("de:f:0.1")
