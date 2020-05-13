@@ -79,7 +79,6 @@ class TestFromStr:
             1139,
             1228,
             60,
-            {},
         )
 
         assert actual == expected

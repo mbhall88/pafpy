@@ -1,8 +1,4 @@
-"""
-TODO: write docs here
-TODO: docstring tests
-TODO: implement PafFile
-"""
+"""TODO"""
 from enum import Enum
 from typing import Dict, NamedTuple, Optional
 
@@ -162,7 +158,7 @@ class PafRecord(NamedTuple):
             mlen=int(fields[9]),
             blen=int(fields[10]),
             mapq=int(fields[11]),
-            tags=tags,
+            tags=tags or None,
         )
 
     @property
