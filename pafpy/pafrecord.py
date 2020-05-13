@@ -89,7 +89,7 @@ class PafRecord(NamedTuple):
     """Number of matching bases in the mapping."""
     blen: int = 0
     """Alignment block length. Number of bases, including gaps, in the mapping."""
-    mapq: int = 0
+    mapq: int = 255
     """Mapping quality (0-255; 255 for missing)."""
     tags: Optional[Tags] = None
     """[SAM-like optional fields (tags)](https://samtools.github.io/hts-specs/SAMtags.pdf)."""
