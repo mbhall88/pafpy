@@ -28,7 +28,7 @@ test-code: clean
 
 .PHONY: test-docs
 test-docs:
-	poetry run scripts/mkpydoctest -o tests/test_docs.py pafpy/
+	poetry run scripts/mdpydoctest -o tests/test_docs.py pafpy/
 
 .PHONY: test
 test: test-code test-docs clean
