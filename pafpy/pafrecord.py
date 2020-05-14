@@ -1,4 +1,16 @@
-"""TODO"""
+"""This module contains objects for working with single alignment records within a PAF
+file.
+
+The main class of interest here is `PafRecord`. It provides a set of member
+variables relating to each field within the record, as well as some convenience methods
+for common tasks.
+
+To use `PafRecord` within your code, import it like so
+
+```py
+from pafpy import PafRecord
+```
+"""
 from enum import Enum
 from typing import Dict, NamedTuple, Optional
 
@@ -18,7 +30,7 @@ class MalformattedRecord(Exception):
 
 
 class AlignmentType(Enum):
-    """An enum for storing mappings between the value in the tp tag and the type of
+    """An enum for storing mappings between the value in the `tp` tag and the type of
     alignment this value indicates.
     """
 
@@ -33,8 +45,8 @@ class PafRecord(NamedTuple):
 
     There are two ways to construct a `PafRecord`:
     
-    1. The default constructor, where you specify each member variable by hand.
-    2. Using the `from_str` factory method.
+    1. The default constructor, where you specify each member variable manually.
+    2. Using the `PafRecord.from_str` factory method.
 
     ## Example
     ```py
@@ -76,7 +88,9 @@ class PafRecord(NamedTuple):
     qend: int = 0
     """Query end (0-based; BED-like; open)."""
     strand: Strand = Strand.Unmapped
-    """‘+’ if query/target on the same strand; ‘-’ if opposite; '*' if unmapped."""
+    """`pafpy.strand.Strand.Forward` if query/target on the same strand; 
+    `pafpy.strand.Strand.Reverse` if opposite; 
+    `pafpy.strand.Strand.Unmapped` if unmapped."""
     tname: str = "*"
     """Target sequence name."""
     tlen: int = 0
@@ -92,7 +106,8 @@ class PafRecord(NamedTuple):
     mapq: int = 255
     """Mapping quality (0-255; 255 for missing)."""
     tags: Optional[Tags] = None
-    """[SAM-like optional fields (tags)](https://samtools.github.io/hts-specs/SAMtags.pdf)."""
+    """[SAM-like optional fields (tags)](https://samtools.github.io/hts-specs/SAMtags.pdf). 
+    It is recommended to use `PafRecord.get_tag` to retrieve individual tags."""
 
     def __str__(self) -> str:
         tag_str = "" if self.tags is None else DELIM.join(self.tags)
@@ -117,7 +132,8 @@ class PafRecord(NamedTuple):
     def from_str(line: str) -> "PafRecord":
         """Construct a `PafRecord` from a string.
 
-        Note: If there are duplicate SAM-like tags, only the last one will be retained.
+        > *Note: If there are duplicate SAM-like tags, only the last one will be
+        retained.*
 
         ## Example
         ```py
@@ -133,7 +149,8 @@ class PafRecord(NamedTuple):
         ## Errors
         - If there are less than the expected number of fields (12), this function will
         raise a `MalformattedRecord` exception.
-        - If there is an invalid tag, an `InvalidTagFormat` exception will be raised.
+        - If there is an invalid tag, an `pafpy.tag.InvalidTagFormat` exception will
+        be raised.
         """
         fields = line.rstrip().split(DELIM)
         if len(fields) < MIN_FIELDS:
@@ -165,7 +182,7 @@ class PafRecord(NamedTuple):
     def query_aligned_length(self) -> int:
         """Length of the aligned query sequence.
 
-        This is equal to the absolute value of `qend` - `qstart`.
+        This is equal to the absolute value of `PafRecord.qend` - `PafRecord.qstart`.
         """
         return abs(self.qend - self.qstart)
 
@@ -173,7 +190,7 @@ class PafRecord(NamedTuple):
     def query_coverage(self) -> float:
         """Proportion of the query sequence involved in the alignment.
 
-        This is equal to `query_aligned_length` - `qlen`
+        This is equal to `PafRecord.query_aligned_length` - `PafRecord.qlen`
 
         ## Example
         ```py
@@ -192,7 +209,7 @@ class PafRecord(NamedTuple):
     def target_coverage(self) -> float:
         """Proportion of the target sequence involved in the alignment.
 
-        This is equal to `target_aligned_length` - `tlen`
+        This is equal to `PafRecord.target_aligned_length` - `PafRecord.tlen`
 
         ## Example
         ```py
@@ -211,7 +228,7 @@ class PafRecord(NamedTuple):
     def target_aligned_length(self) -> int:
         """Length of the aligned target sequence.
 
-        This is equal to the absolute value of `tend` - `tstart`.
+        This is equal to the absolute value of `PafRecord.tend` - `PafRecord.tstart`.
         """
         return abs(self.tend - self.tstart)
 
@@ -219,7 +236,8 @@ class PafRecord(NamedTuple):
     def relative_length(self) -> float:
         """Relative (aligned) length of the query sequence to the target.
 
-        This is equal to `query_aligned_length` - `target_aligned_length`.
+        This is equal to `PafRecord.query_aligned_length` -
+        `PafRecord.target_aligned_length`.
 
         ## Example
         ```py
@@ -237,8 +255,13 @@ class PafRecord(NamedTuple):
     def blast_identity(self) -> float:
         """Calculates the [BLAST identity][blast] for the record.
 
-        BLAST identity is defined as the number of matching bases over the number of
-        alignment columns.
+        BLAST identity is defined as the number of matching bases (`PafRecord.mlen`)
+        over the number of alignment columns (`PafRecord.blen`).
+
+         > *Note: If your PAF file was generated from minimap2, it is strongly advised
+        that you ensure either the `-c` or `--cs` options were used when generating the
+        alignment, otherwise the BLAST identity will be very inaccurate. See the
+        [minimap2 FAQ][faq] for more information.*
 
         ## Example
         ```py
@@ -251,6 +274,7 @@ class PafRecord(NamedTuple):
         assert record.blast_identity() == 0.86
         ```
         [blast]: https://lh3.github.io/2018/11/25/on-the-definition-of-sequence-identity#blast-identity
+        [faq]: https://github.com/lh3/minimap2/blob/master/FAQ.md#1-alignment-different-with-option--a-or--c
         """
         try:
             return self.mlen / self.blen
@@ -260,7 +284,8 @@ class PafRecord(NamedTuple):
     def is_unmapped(self) -> bool:
         """Is the record unmapped?
 
-        A record is considered unmapped if the strand is '*' - as per the minimap2
+        A record is considered unmapped if the strand is '*'
+        (`pafpy.strand.Strand.Unmapped`) - as per the minimap2
         [`--paf-no-hit`][io-opts] parameter behaviour.
 
         ## Example
@@ -278,9 +303,9 @@ class PafRecord(NamedTuple):
     def is_primary(self) -> bool:
         """Is the record a primary alignment?
 
-        This is determined from the ['tp' tag][mm2-tags].
+        This is determined from the [`tp` tag][mm2-tags].
 
-        *Note: Supplementary alignments will also return `True`.*
+        > *Note: Supplementary alignments will also return `True`.*
 
         ## Example
         ```py
@@ -292,7 +317,7 @@ class PafRecord(NamedTuple):
         ```
 
         ## Errors
-        If the value in the 'tp' tag is unknown, a `ValueError` exception will be
+        If the value in the `tp` tag is unknown, a `ValueError` exception will be
         raised.
 
         [mm2-tags]: https://lh3.github.io/minimap2/minimap2.html#10
@@ -308,9 +333,9 @@ class PafRecord(NamedTuple):
     def is_secondary(self) -> bool:
         """Is the record a secondary alignment?
 
-        This is determined from the ['tp' tag][mm2-tags].
+        This is determined from the [`tp` tag][mm2-tags].
 
-        *Note: Supplementary alignments will return `False` as they are considered
+        > *Note: Supplementary alignments will return `False` as they are considered
         primary.*
 
         ## Example
@@ -323,7 +348,7 @@ class PafRecord(NamedTuple):
         ```
 
         ## Errors
-        If the value in the 'tp' tag is unknown, a `ValueError` exception will be
+        If the value in the `tp` tag is unknown, a `ValueError` exception will be
         raised.
 
         [mm2-tags]: https://lh3.github.io/minimap2/minimap2.html#10
@@ -339,7 +364,7 @@ class PafRecord(NamedTuple):
     def is_inversion(self) -> bool:
         """Is the alignment an inversion?
 
-        This is determined from the ['tp' tag][mm2-tags]. For more information about
+        This is determined from the [`tp` tag][mm2-tags]. For more information about
         inversions (from minimap2) refer to the [minimap2 alignment options][aln-opts].
 
         ## Example
@@ -352,7 +377,7 @@ class PafRecord(NamedTuple):
         ```
 
         ## Errors
-        If the value in the 'tp' tag is unknown, a `ValueError` exception will be
+        If the value in the `tp` tag is unknown, a `ValueError` exception will be
         raised.
 
         [mm2-tags]: https://lh3.github.io/minimap2/minimap2.html#10

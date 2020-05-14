@@ -11,5 +11,7 @@ ignore =
     E501,
     W503,
     W504,
+    # ignore W291 because formatting of variable docstrings triggers this.
+    W291,
     # ignore W293 because PyCharm inserts blanks in docstring. See https://github.com/NilsJPWerner/autoDocstring/issues/34
     W293
