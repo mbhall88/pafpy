@@ -93,6 +93,10 @@ def get_valid_files_in_dir(
                 )
 
 
+def get_indent_level(string: str) -> int:
+    return re.search(r"\S", string).start()
+
+
 def create_tests_for_code_blocks(code: str, filename: str) -> str:
     """Function that extracts all python markdown-fenced code blocks in a file and
     creates a test function for each snippet. Returns a string containing all the
@@ -101,21 +105,28 @@ def create_tests_for_code_blocks(code: str, filename: str) -> str:
     lines = code.splitlines()
     test_code = ""
     inside_code = False
-    for line_num, line in enumerate(map(str.strip, lines)):
-        if line.startswith("```py"):
+    initial_indent = 0
+    for line_num, line in enumerate(lines):
+        if "```py" in line:
             inside_code = True
+            initial_indent = get_indent_level(line)
             test_code += generate_test_function_name(line_num, filename) + "\n"
             continue
-        if line.startswith("```") and inside_code:
+        if "```" in line and inside_code:
             test_code += "\n"
             inside_code = False
             continue
-        elif line.startswith("```"):
+        elif "```" in line:
             raise SyntaxError(
                 f"Detected unbalanced open/close of code block in line {line_num}"
             )
-        if inside_code:
-            test_code += f"    {line}\n"
+        if inside_code and line.strip():  # we ignore blank lines inside code blocks
+            absolute_indent_level = get_indent_level(line)
+            relative_indent_level = absolute_indent_level - initial_indent
+            indent_for_test = " " * (
+                relative_indent_level + 1
+            )  # +1 because we are implicitly inside a test function
+            test_code += f"{indent_for_test}{line}\n"
 
     return test_code
 
