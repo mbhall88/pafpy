@@ -46,7 +46,7 @@ class PafRecord(NamedTuple):
     There are two ways to construct a `PafRecord`:
     
     1. The default constructor, where you specify each member variable manually.
-    2. Using the `PafRecord.from_str` factory method.
+    2. Using the `PafRecord.from_str` factory constructor method.
 
     ## Example
     ```py

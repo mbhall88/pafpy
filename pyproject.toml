@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "A light-weight library for working with PAF (Pairwise mApping Format) files"
 authors = ["Michael Hall <michael@mbh.sh>"]
 license = "Unlicense"
+# TODO: add extra fields
 
 [tool.poetry.dependencies]
 python = "^3.6"
