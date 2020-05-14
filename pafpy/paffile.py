@@ -1,4 +1,14 @@
-"""TODO"""
+"""This module contains objects for working with PAF files.
+
+The main class of interest here is `PafFile`. It provides an interface to open/close
+a PAF file and to iterate over the alignment records within the file.
+
+To use `PafFile` within your code, import it like so
+
+```py
+from pafpy import PafFile
+```
+"""
 import os
 from pathlib import Path
 from typing import Optional, TextIO, Union
@@ -9,11 +19,48 @@ PathLike = Union[Path, str, os.PathLike]
 
 
 class PafFile:
-    """TODO"""
+    """Stream access to a PAF file.
+
+    The file is *not* automatically opened. After construction, it can be opened in
+    one of two ways:
+
+    1. Manually, with `PafFile.open`. Rememeber to close the file when finished.
+    2. Via a context manager (`with`) block.
+
+    ## Example
+    ```py
+    from pafpy import PafFile, PafRecord
+    from pathlib import Path
+    import tempfile
+
+    # create a dummy PAF file
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        # make two unmapped records
+        record1 = PafRecord(qname="record1")
+        record2 = PafRecord(qname="record2")
+        # write records to temporary file
+        path = Path(f"{tmpdirname}/test.paf")
+        with path.open("w") as stream:
+            print(str(record1), file=stream)
+            print(str(record2), file=stream)
+
+        # open the PAF file with the context manager
+        with PafFile(path) as paf:
+            actual_records = [record for record in paf]
+
+    assert paf.closed
+
+    expected_records = [record1, record2]
+    assert actual_records == expected_records
+    ```
+
+    The records returned when iterating over the open `PafFile` are
+    `pafpy.pafrecord.PafRecord` objects.
+    """
 
     def __init__(self, path: PathLike):
         self.path = Path(path)
-        """The path to the PAF file."""
+        """Path to the PAF file. Can be a `str` or a `pathlib.Path` object."""
         self._stream: Optional[TextIO] = None
 
     def __del__(self):
@@ -37,8 +84,8 @@ class PafFile:
         """Opens the PAF file to allow iterating over the records. Returns a `PafFile`
         object.
 
-        Where possible, try and use the `with` contenxt manager instead of explicitly
-        calling `open` and `close`.
+        Where possible, try and use the `with` context manager instead of explicitly
+        calling `PafFile.open` and `PafFile.close`.
 
         ## Example
         ```py
