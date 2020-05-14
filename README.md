@@ -1,6 +1,6 @@
 # pafpy
 
-A light-weight library for working with PAF (Pairwise mApping Format) files
+A light-weight library for working with [PAF][PAF] (Pairwise mApping Format) files.
 
 <!--[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mbhall88/pafpy/Python_package)](https://github.com/mbhall88/pafpy/actions)-->
 <!--[![codecov](https://codecov.io/gh/mbhall88/pafpy/branch/master/graph/badge.svg)](https://codecov.io/gh/mbhall88/pafpy)-->
@@ -44,3 +44,4 @@ make test
 
 
 [poetry]: https://python-poetry.org/
+[PAF]: https://github.com/lh3/miniasm/blob/master/PAF.md
