@@ -65,17 +65,29 @@ to ensure all code examples in the docstrings are correct. To test the docs, run
 make test-docs
 ```
 
+### Coverage
+
+Please try and keep the project's code coverage as high as possible. To check the code
+covergae, run
+
+```shell
+make coverage
+```
+
+This should show the coverage on the terminal and also open a HTML report in your web
+browser.
+
 ## Documentation
 
-The code is documented using markdown docstrings. The convention this project follows
-is akin to that used by the Rust programming language. The beginning of the docstring
+The code is documented using markdown docstrings. The convention this project follows is
+akin to that used by the Rust programming language. The beginning of the docstring
 should explain what the function does and if it returns anything. This is followed,
 where relevant, by an example section `## Example`. All examples should be valid,
-self-contained examples that can be copied and pasted in to a python shell and
-executed successfully (assuming the user has `pafpy` installed). These code snippets
-must be in a code block annotated at `py` or `python`. See the code for examples. If
-the code being documented can raise an exception, the type(s) of execptions should be
-documented in a `## Errors` section also.
+self-contained examples that can be copied and pasted in to a python shell and executed
+successfully (assuming the user has `pafpy` installed). These code snippets must be in a
+code block annotated at `py` or `python`. See the code for examples. If the code being
+documented can raise an exception, the type(s) of execptions should be documented in a
+`## Errors` section also.
 
 The documentation can be viewed by running
 
@@ -95,3 +107,4 @@ make precommit
 [poetry]: https://python-poetry.org/
 [lock]: https://github.com/mbhall88/pafpy/blob/master/poetry.lock
 [mdpydoctest]: https://github.com/mbhall88/pafpy/blob/master/scripts/mdpydoctest
+
