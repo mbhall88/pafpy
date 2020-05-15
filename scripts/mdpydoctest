@@ -107,18 +107,28 @@ def create_tests_for_code_blocks(code: str, filename: str) -> str:
     inside_code = False
     initial_indent = 0
     for line_num, line in enumerate(lines):
-        if "```py" in line:
+        if "```py" in line and not inside_code:
             inside_code = True
             initial_indent = get_indent_level(line)
             test_code += generate_test_function_name(line_num, filename) + "\n"
             continue
+        elif "```py" in line and inside_code:
+            raise SyntaxError(
+                (
+                    f"Detected unbalanced open/close of code block in line {line_num} "
+                    f"of {filename}"
+                )
+            )
         if "```" in line and inside_code:
             test_code += "\n"
             inside_code = False
             continue
-        elif "```" in line:
-            raise SyntaxError(
-                f"Detected unbalanced open/close of code block in line {line_num}"
+        elif "```" in line and not inside_code:
+            logging.warning(
+                (
+                    f"Detected unbalanced open/close of code block in line {line_num} "
+                    f"of {filename}. This could be caused by non-python blocks though."
+                )
             )
         if inside_code and line.strip():  # we ignore blank lines inside code blocks
             absolute_indent_level = get_indent_level(line)
