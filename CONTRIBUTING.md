@@ -9,8 +9,8 @@ The recommended development environment is through [poetry][poetry]. If you pref
 use something else that is fine, but beware it could lead to different environment
 behaviour. The [`poetry.lock`][lock] file under version control should ensure you are
 setup with the exact same environment as anyone else contributing to the library. Most
-of the standard development tasks are managed through a `Makefile`. The `Makefile`
-assumes that you are using `poetry`.
+of the standard development tasks are managed through a `Makefile`. The
+[`Makefile`][makefile] assumes that you are using `poetry`.
 
 After cloning your fork locally and entering to project directory, you can setup the
 poetry environment with
@@ -105,6 +105,7 @@ make precommit
 ```
 
 [poetry]: https://python-poetry.org/
+[makefile]: https://github.com/mbhall88/pafpy/blob/master/Makefile
 [lock]: https://github.com/mbhall88/pafpy/blob/master/poetry.lock
 [mdpydoctest]: https://github.com/mbhall88/pafpy/blob/master/scripts/mdpydoctest
 
