@@ -135,7 +135,7 @@
 
   <section>
     % if submodules:
-    <h1 class="section-title" id="header-submodules">API</h1>
+    <h1 class="section-title" id="header-submodules">API documentation</h1>
     <dl>
     % for m in submodules:
       <dt><code class="name">${link(m)}</code></dt>
@@ -305,7 +305,7 @@
     % endif
 
     % if submodules:
-    <li><h3><a href="#header-submodules">API</a></h3>
+    <li><h3><a href="#header-submodules">API documentation</a></h3>
       <ul>
       % for m in submodules:
         <li><code>${link(m)}</code></li>
