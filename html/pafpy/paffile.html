@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.1" />
 <title>pafpy.paffile API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="This module contains objects for working with PAF files …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,21 +20,79 @@
 <h1 class="title">Module <code>pafpy.paffile</code></h1>
 </header>
 <section id="section-intro">
+<p>This module contains objects for working with PAF files.</p>
+<p>The main class of interest here is <code><a title="pafpy.paffile.PafFile" href="#pafpy.paffile.PafFile">PafFile</a></code>. It provides an interface to open/close
+a PAF file and to iterate over the alignment records within the file.</p>
+<p>To use <code><a title="pafpy.paffile.PafFile" href="#pafpy.paffile.PafFile">PafFile</a></code> within your code, import it like so</p>
+<pre><code class="py">from pafpy import PafFile
+</code></pre>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from pathlib import Path
+<pre><code class="python">&#34;&#34;&#34;This module contains objects for working with PAF files.
+
+The main class of interest here is `PafFile`. It provides an interface to open/close
+a PAF file and to iterate over the alignment records within the file.
+
+To use `PafFile` within your code, import it like so
+
+```py
+from pafpy import PafFile
+```
+&#34;&#34;&#34;
 import os
-from typing import Union, Optional, TextIO
+from pathlib import Path
+from typing import Optional, TextIO, Union
+
+from pafpy.pafrecord import PafRecord
 
 PathLike = Union[Path, str, os.PathLike]
 
 
 class PafFile:
+    &#34;&#34;&#34;Stream access to a PAF file.
+
+    The file is *not* automatically opened. After construction, it can be opened in
+    one of two ways:
+
+    1. Manually, with `PafFile.open`. Rememeber to close the file when finished.
+    2. Via a context manager (`with`) block.
+
+    ## Example
+    ```py
+    from pafpy import PafFile, PafRecord
+    from pathlib import Path
+    import tempfile
+
+    # create a dummy PAF file
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        # make two unmapped records
+        record1 = PafRecord(qname=&#34;record1&#34;)
+        record2 = PafRecord(qname=&#34;record2&#34;)
+        # write records to temporary file
+        path = Path(f&#34;{tmpdirname}/test.paf&#34;)
+        with path.open(&#34;w&#34;) as stream:
+            print(str(record1), file=stream)
+            print(str(record2), file=stream)
+
+        # open the PAF file with the context manager
+        with PafFile(path) as paf:
+            actual_records = [record for record in paf]
+
+    assert paf.closed
+
+    expected_records = [record1, record2]
+    assert actual_records == expected_records
+    ```
+
+    The records returned when iterating over the open `PafFile` are
+    `pafpy.pafrecord.PafRecord` objects.
+    &#34;&#34;&#34;
+
     def __init__(self, path: PathLike):
         self.path = Path(path)
-        &#34;&#34;&#34;The path to the PAF file.&#34;&#34;&#34;
+        &#34;&#34;&#34;Path to the PAF file. Can be a `str` or a `pathlib.Path` object.&#34;&#34;&#34;
         self._stream: Optional[TextIO] = None
 
     def __del__(self):
@@ -46,12 +104,20 @@ class PafFile:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
+    def __iter__(self):
+        return self
+
+    def __next__(self) -&gt; PafRecord:
+        if self.closed:
+            raise IOError(&#34;PAF file is closed - cannot get next element.&#34;)
+        return PafRecord.from_str(next(self._stream))
+
     def open(self) -&gt; &#34;PafFile&#34;:
         &#34;&#34;&#34;Opens the PAF file to allow iterating over the records. Returns a `PafFile`
         object.
 
-        Where possible, try and use the `with` contenxt manager instead of explicitly
-        calling `open` and `close`.
+        Where possible, try and use the `with` context manager instead of explicitly
+        calling `PafFile.open` and `PafFile.close`.
 
         ## Example
         ```py
@@ -77,12 +143,14 @@ class PafFile:
 
     @property
     def closed(self) -&gt; bool:
+        &#34;&#34;&#34;Is the PAF file closed?&#34;&#34;&#34;
         return self._stream is None or self._stream.closed
 
     def close(self):
         &#34;&#34;&#34;Close the `PafFile`.&#34;&#34;&#34;
         if not self.closed:
-            self._stream.close()</code></pre>
+            self._stream.close()
+            self._stream = None</code></pre>
 </details>
 </section>
 <section>
@@ -99,15 +167,87 @@ class PafFile:
 <span>(</span><span>path: Union[str, os.PathLike])</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Stream access to a PAF file.</p>
+<p>The file is <em>not</em> automatically opened. After construction, it can be opened in
+one of two ways:</p>
+<ol>
+<li>Manually, with <code><a title="pafpy.paffile.PafFile.open" href="#pafpy.paffile.PafFile.open">PafFile.open()</a></code>. Rememeber to close the file when finished.</li>
+<li>Via a context manager (<code>with</code>) block.</li>
+</ol>
+<h2 id="example">Example</h2>
+<pre><code class="py">from pafpy import PafFile, PafRecord
+from pathlib import Path
+import tempfile
+
+# create a dummy PAF file
+with tempfile.TemporaryDirectory() as tmpdirname:
+    # make two unmapped records
+    record1 = PafRecord(qname=&quot;record1&quot;)
+    record2 = PafRecord(qname=&quot;record2&quot;)
+    # write records to temporary file
+    path = Path(f&quot;{tmpdirname}/test.paf&quot;)
+    with path.open(&quot;w&quot;) as stream:
+        print(str(record1), file=stream)
+        print(str(record2), file=stream)
+
+    # open the PAF file with the context manager
+    with PafFile(path) as paf:
+        actual_records = [record for record in paf]
+
+assert paf.closed
+
+expected_records = [record1, record2]
+assert actual_records == expected_records
+</code></pre>
+<p>The records returned when iterating over the open <code><a title="pafpy.paffile.PafFile" href="#pafpy.paffile.PafFile">PafFile</a></code> are
+<code><a title="pafpy.pafrecord.PafRecord" href="pafrecord.html#pafpy.pafrecord.PafRecord">PafRecord</a></code> objects.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class PafFile:
+    &#34;&#34;&#34;Stream access to a PAF file.
+
+    The file is *not* automatically opened. After construction, it can be opened in
+    one of two ways:
+
+    1. Manually, with `PafFile.open`. Rememeber to close the file when finished.
+    2. Via a context manager (`with`) block.
+
+    ## Example
+    ```py
+    from pafpy import PafFile, PafRecord
+    from pathlib import Path
+    import tempfile
+
+    # create a dummy PAF file
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        # make two unmapped records
+        record1 = PafRecord(qname=&#34;record1&#34;)
+        record2 = PafRecord(qname=&#34;record2&#34;)
+        # write records to temporary file
+        path = Path(f&#34;{tmpdirname}/test.paf&#34;)
+        with path.open(&#34;w&#34;) as stream:
+            print(str(record1), file=stream)
+            print(str(record2), file=stream)
+
+        # open the PAF file with the context manager
+        with PafFile(path) as paf:
+            actual_records = [record for record in paf]
+
+    assert paf.closed
+
+    expected_records = [record1, record2]
+    assert actual_records == expected_records
+    ```
+
+    The records returned when iterating over the open `PafFile` are
+    `pafpy.pafrecord.PafRecord` objects.
+    &#34;&#34;&#34;
+
     def __init__(self, path: PathLike):
         self.path = Path(path)
-        &#34;&#34;&#34;The path to the PAF file.&#34;&#34;&#34;
+        &#34;&#34;&#34;Path to the PAF file. Can be a `str` or a `pathlib.Path` object.&#34;&#34;&#34;
         self._stream: Optional[TextIO] = None
 
     def __del__(self):
@@ -119,12 +259,20 @@ class PafFile:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
+    def __iter__(self):
+        return self
+
+    def __next__(self) -&gt; PafRecord:
+        if self.closed:
+            raise IOError(&#34;PAF file is closed - cannot get next element.&#34;)
+        return PafRecord.from_str(next(self._stream))
+
     def open(self) -&gt; &#34;PafFile&#34;:
         &#34;&#34;&#34;Opens the PAF file to allow iterating over the records. Returns a `PafFile`
         object.
 
-        Where possible, try and use the `with` contenxt manager instead of explicitly
-        calling `open` and `close`.
+        Where possible, try and use the `with` context manager instead of explicitly
+        calling `PafFile.open` and `PafFile.close`.
 
         ## Example
         ```py
@@ -150,30 +298,33 @@ class PafFile:
 
     @property
     def closed(self) -&gt; bool:
+        &#34;&#34;&#34;Is the PAF file closed?&#34;&#34;&#34;
         return self._stream is None or self._stream.closed
 
     def close(self):
         &#34;&#34;&#34;Close the `PafFile`.&#34;&#34;&#34;
         if not self.closed:
-            self._stream.close()</code></pre>
+            self._stream.close()
+            self._stream = None</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
 <dt id="pafpy.paffile.PafFile.closed"><code class="name">var <span class="ident">closed</span> : bool</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Is the PAF file closed?</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
 def closed(self) -&gt; bool:
+    &#34;&#34;&#34;Is the PAF file closed?&#34;&#34;&#34;
     return self._stream is None or self._stream.closed</code></pre>
 </details>
 </dd>
 <dt id="pafpy.paffile.PafFile.path"><code class="name">var <span class="ident">path</span></code></dt>
 <dd>
-<div class="desc"><p>The path to the PAF file.</p></div>
+<div class="desc"><p>Path to the PAF file. Can be a <code>str</code> or a <code>pathlib.Path</code> object.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -190,7 +341,8 @@ def closed(self) -&gt; bool:
 <pre><code class="python">def close(self):
     &#34;&#34;&#34;Close the `PafFile`.&#34;&#34;&#34;
     if not self.closed:
-        self._stream.close()</code></pre>
+        self._stream.close()
+        self._stream = None</code></pre>
 </details>
 </dd>
 <dt id="pafpy.paffile.PafFile.open"><code class="name flex">
@@ -199,8 +351,8 @@ def closed(self) -&gt; bool:
 <dd>
 <div class="desc"><p>Opens the PAF file to allow iterating over the records. Returns a <code><a title="pafpy.paffile.PafFile" href="#pafpy.paffile.PafFile">PafFile</a></code>
 object.</p>
-<p>Where possible, try and use the <code>with</code> contenxt manager instead of explicitly
-calling <code>open</code> and <code>close</code>.</p>
+<p>Where possible, try and use the <code>with</code> context manager instead of explicitly
+calling <code><a title="pafpy.paffile.PafFile.open" href="#pafpy.paffile.PafFile.open">PafFile.open()</a></code> and <code><a title="pafpy.paffile.PafFile.close" href="#pafpy.paffile.PafFile.close">PafFile.close()</a></code>.</p>
 <h2 id="example">Example</h2>
 <pre><code class="py">from pafpy import PafFile
 
@@ -225,8 +377,8 @@ assert paf.closed
     &#34;&#34;&#34;Opens the PAF file to allow iterating over the records. Returns a `PafFile`
     object.
 
-    Where possible, try and use the `with` contenxt manager instead of explicitly
-    calling `open` and `close`.
+    Where possible, try and use the `with` context manager instead of explicitly
+    calling `PafFile.open` and `PafFile.close`.
 
     ## Example
     ```py

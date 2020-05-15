@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.1" />
 <title>pafpy API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="pafpy …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,14 +20,104 @@
 <h1 class="title">Package <code>pafpy</code></h1>
 </header>
 <section id="section-intro">
+<h1 id="pafpy">pafpy</h1>
+<p>A light-weight library for working with PAF (Pairwise mApping Format) files</p>
+<!--[![GitHub Workflow Status](<https://img.shields.io/github/workflow/status/mbhall88/pafpy/Python_package>)](<https://github.com/mbhall88/pafpy/actions>)-->
+<!--[![codecov](<https://codecov.io/gh/mbhall88/pafpy/branch/master/graph/badge.svg>)](<https://codecov.io/gh/mbhall88/pafpy>)-->
+<p><img alt="License" src="https://img.shields.io/github/license/mbhall88/pafpy">
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a></p>
+<h2 id="install">Install</h2>
+<h3 id="pypi">PyPi</h3>
+<pre><code class="shell">pip install pafpy
+</code></pre>
+<h3 id="conda">Conda</h3>
+<pre><code class="shell">conda install -c bioconda pafpy
+</code></pre>
+<h3 id="locally">Locally</h3>
+<p>If you would like to install locally, the recommended way is using <a href="https://python-poetry.org/">poetry</a>.</p>
+<pre><code class="shell">git clone https://github.com/mbhall88/pafpy.git
+cd pafpy
+make install
+# to check the library is installed run
+poetry run python -c &quot;from pafpy import PafRecord;print(str(PafRecord()))&quot;
+# you should see a (unmapped) PAF record printed to the terminal
+# you can also run the tests if you like
+make test
+</code></pre>
+<h2 id="usage">Usage</h2>
+<h2 id="a-random-heading">A random heading</h2>
+<h1 id="contributing">Contributing</h1>
+<p>Contributions are very welcome. Please ensure all of your contributions are made via a
+pull request from a fork.</p>
+<h2 id="setup">Setup</h2>
+<p>The recommended development environment is through <a href="https://python-poetry.org/">poerty</a>. If you prefer to
+use something else that is fine, but beware it could lead to different environment
+behaviour. The <a href="https://github.com/mbhall88/pafpy/blob/master/poetry.lock"><code>poetry.lock</code></a> file under version control should ensure you are
+setup with the exact same environment as anyone else contributing to the library. Most
+of the standard development tasks are managed through a <code>Makefile</code>.</p>
+<p>After cloning your fork locally and entering to project directory, you can setup the
+poetry environment with</p>
+<pre><code class="shell">make install
+</code></pre>
+<h2 id="formatting">Formatting</h2>
+<p>All code is formatted with <code>black</code> and <code>isort</code>. To format the project, run</p>
+<pre><code class="shell">make fmt
+</code></pre>
+<h2 id="linting">Linting</h2>
+<p>Linting is done by <code>flake8</code>. Please ensure there are no warnings prior to pushing any
+work.</p>
+<pre><code class="shell">make lint
+</code></pre>
+<h2 id="testing">Testing</h2>
+<p>To test both the code and documentation, run</p>
+<pre><code class="shell">make test
+</code></pre>
+<h3 id="code">Code</h3>
+<p>All unit tests are contained in the <code>tests</code> directory. If you add any code, please
+ensure it is tested. Tests are handled by <code>pytest</code>. To test just the code, without the
+also testing the documentation, run</p>
+<pre><code class="shell">make test-code
+</code></pre>
+<h3 id="docs">Docs</h3>
+<p>The document testing is orchestrated by <a href="https://github.com/mbhall88/pafpy/blob/master/scripts/mdpydoctest"><code>scripts/mdpydoctest</code></a>. This
+script will extract all markdown python code blocks from docstrings in python files and
+write a test file with a unit test for each snippet. It then runs <code>pytest</code> on this file
+to ensure all code examples in the docstrings are correct. To test the docs, run</p>
+<pre><code class="shell">make test-docs
+</code></pre>
+<h2 id="documentation">Documentation</h2>
+<p>The code is documented using markdown docstrings. The convention this project follows
+is akin to that used by the Rust programming language. The beginning of the docstring
+should explain what the function does and if it returns anything. This is followed,
+where relevant, by an example section <code>## Example</code>. All examples should be valid,
+self-contained examples that can be copied and pasted in to a python shell and
+executed successfully (assuming the user has <code><a title="pafpy" href="#pafpy">pafpy</a></code> installed). These code snippets
+must be in a code block annotated at <code>py</code> or <code>python</code>. See the code for examples. If
+the code being documented can raise an exception, the type(s) of execptions should be
+documented in a <code>## Errors</code> section also.</p>
+<p>The documentation can be viewed by running</p>
+<pre><code class="shell">make docs
+</code></pre>
+<h2 id="committing">Committing</h2>
+<p>There is a convenience rule in the <code>Makefile</code> that can be run prior to committing that
+will run most of the above tasks for you</p>
+<pre><code class="shell">make precommit
+</code></pre>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from pafpy.pafrecord import PafRecord  # noqa: F401
+<pre><code class="python">&#34;&#34;&#34;.. include:: ../README.md
+
+## A random heading
+
+
+.. include:: ../CONTRIBUTING.md
+&#34;&#34;&#34;
+from pafpy.paffile import PafFile  # noqa: F401
+from pafpy.pafrecord import PafRecord  # noqa: F401
 from pafpy.strand import Strand  # noqa: F401
-from pafpy.tag import Tag, TagType, TagTypes  # noqa: F401
-from pafpy.paffile import PafFile  # noqa: F401</code></pre>
+from pafpy.tag import Tag, TagType, TagTypes  # noqa: F401</code></pre>
 </details>
 </section>
 <section>
@@ -35,12 +125,12 @@ from pafpy.paffile import PafFile  # noqa: F401</code></pre>
 <dl>
 <dt><code class="name"><a title="pafpy.paffile" href="paffile.html">pafpy.paffile</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>This module contains objects for working with PAF files …</p></div>
 </dd>
 <dt><code class="name"><a title="pafpy.pafrecord" href="pafrecord.html">pafpy.pafrecord</a></code></dt>
 <dd>
-<div class="desc"><p>TODO: write docs here
-TODO: implement PafFile</p></div>
+<div class="desc"><p>This module contains objects for working with single alignment records within a PAF
+file …</p></div>
 </dd>
 <dt><code class="name"><a title="pafpy.strand" href="strand.html">pafpy.strand</a></code></dt>
 <dd>
@@ -62,7 +152,32 @@ TODO: implement PafFile</p></div>
 <nav id="sidebar">
 <h1>Index</h1>
 <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#pafpy">pafpy</a><ul>
+<li><a href="#install">Install</a><ul>
+<li><a href="#pypi">PyPi</a></li>
+<li><a href="#conda">Conda</a></li>
+<li><a href="#locally">Locally</a></li>
+</ul>
+</li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#a-random-heading">A random heading</a></li>
+</ul>
+</li>
+<li><a href="#contributing">Contributing</a><ul>
+<li><a href="#setup">Setup</a></li>
+<li><a href="#formatting">Formatting</a></li>
+<li><a href="#linting">Linting</a></li>
+<li><a href="#testing">Testing</a><ul>
+<li><a href="#code">Code</a></li>
+<li><a href="#docs">Docs</a></li>
+</ul>
+</li>
+<li><a href="#documentation">Documentation</a></li>
+<li><a href="#committing">Committing</a></li>
+</ul>
+</li>
+</ul>
 </div>
 <ul id="index">
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>

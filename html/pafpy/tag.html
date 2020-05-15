@@ -22,6 +22,10 @@
 <section id="section-intro">
 <p>A module for wrapping SAM-like optional fields (tags) generally used in PAF files.</p>
 <p>The full specifications can he found <a href="https://samtools.github.io/hts-specs/SAMtags.pdf">here</a>.</p>
+<p>The main class of interest in this module is <code><a title="pafpy.tag.Tag" href="#pafpy.tag.Tag">Tag</a></code>. It can be imported into your
+project like so</p>
+<pre><code class="py">from pafpy import Tag
+</code></pre>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -30,6 +34,12 @@
 
 The full specifications can he found [here][specs].
 
+The main class of interest in this module is `Tag`. It can be imported into your
+project like so
+
+```py
+from pafpy import Tag
+```
 [specs]: https://samtools.github.io/hts-specs/SAMtags.pdf
 &#34;&#34;&#34;
 import re
@@ -69,7 +79,7 @@ class TagTypes(Enum):
 
     The value of each variant is a `TagType`.
     The recommended way of initialising a `TagTypes` object is via the factory
-    constructor `from_char`.
+    constructor `TagTypes.from_char`.
 
     For further information, refer to the [optional fields][tags] section of the SAM
     specifications.
@@ -135,12 +145,27 @@ class TagTypes(Enum):
 class Tag(NamedTuple):
     &#34;&#34;&#34;Class representing a single SAM-like optional field (tag).
 
+    There are two ways to construct a `Tag`:
+
+    1. The default constructor, where you specify each member variable manually.
+    2. Using the `Tag.from_str` factory constructor method.
+
+    &gt; *Note: It is recommended that you construct tags using the `Tag.from_str`
+    constructor as it has some additional logic to ensure the type of the value is
+    inferred correctly.*
+
     ## Example
     ```py
     from pafpy import Tag
 
+    # default constructor
     tag = Tag(tag=&#34;NM&#34;, type=&#34;i&#34;, value=50)
     assert str(tag) == &#34;NM:i:50&#34;
+    assert tag.value == 50
+
+    # from_str factory constructor
+    tag_from_str = Tag.from_str(&#34;NM:i:50&#34;)
+    assert tag_from_str == tag
     ```
     &#34;&#34;&#34;
 
@@ -231,11 +256,27 @@ class Tag(NamedTuple):
 </code></dt>
 <dd>
 <div class="desc"><p>Class representing a single SAM-like optional field (tag).</p>
+<p>There are two ways to construct a <code><a title="pafpy.tag.Tag" href="#pafpy.tag.Tag">Tag</a></code>:</p>
+<ol>
+<li>The default constructor, where you specify each member variable manually.</li>
+<li>Using the <code><a title="pafpy.tag.Tag.from_str" href="#pafpy.tag.Tag.from_str">Tag.from_str()</a></code> factory constructor method.</li>
+</ol>
+<blockquote>
+<p><em>Note: It is recommended that you construct tags using the <code><a title="pafpy.tag.Tag.from_str" href="#pafpy.tag.Tag.from_str">Tag.from_str()</a></code>
+constructor as it has some additional logic to ensure the type of the value is
+inferred correctly.</em></p>
+</blockquote>
 <h2 id="example">Example</h2>
 <pre><code class="py">from pafpy import Tag
 
+# default constructor
 tag = Tag(tag=&quot;NM&quot;, type=&quot;i&quot;, value=50)
 assert str(tag) == &quot;NM:i:50&quot;
+assert tag.value == 50
+
+# from_str factory constructor
+tag_from_str = Tag.from_str(&quot;NM:i:50&quot;)
+assert tag_from_str == tag
 </code></pre></div>
 <details class="source">
 <summary>
@@ -244,12 +285,27 @@ assert str(tag) == &quot;NM:i:50&quot;
 <pre><code class="python">class Tag(NamedTuple):
     &#34;&#34;&#34;Class representing a single SAM-like optional field (tag).
 
+    There are two ways to construct a `Tag`:
+
+    1. The default constructor, where you specify each member variable manually.
+    2. Using the `Tag.from_str` factory constructor method.
+
+    &gt; *Note: It is recommended that you construct tags using the `Tag.from_str`
+    constructor as it has some additional logic to ensure the type of the value is
+    inferred correctly.*
+
     ## Example
     ```py
     from pafpy import Tag
 
+    # default constructor
     tag = Tag(tag=&#34;NM&#34;, type=&#34;i&#34;, value=50)
     assert str(tag) == &#34;NM:i:50&#34;
+    assert tag.value == 50
+
+    # from_str factory constructor
+    tag_from_str = Tag.from_str(&#34;NM:i:50&#34;)
+    assert tag_from_str == tag
     ```
     &#34;&#34;&#34;
 
@@ -437,7 +493,7 @@ def from_str(string: str) -&gt; &#34;Tag&#34;:
 <div class="desc"><p>An <code>Enum</code> used to collate all possible <code><a title="pafpy.tag.Tag" href="#pafpy.tag.Tag">Tag</a></code> types.</p>
 <p>The value of each variant is a <code><a title="pafpy.tag.TagType" href="#pafpy.tag.TagType">TagType</a></code>.
 The recommended way of initialising a <code><a title="pafpy.tag.TagTypes" href="#pafpy.tag.TagTypes">TagTypes</a></code> object is via the factory
-constructor <code>from_char</code>.</p>
+constructor <code>TagTypes.from_char</code>.</p>
 <p>For further information, refer to the <a href="https://samtools.github.io/hts-specs/SAMv1.pdf#subsection.1.5">optional fields</a> section of the SAM
 specifications.</p>
 <h2 id="example">Example</h2>
@@ -458,7 +514,7 @@ exception will be raised.</p></div>
 
     The value of each variant is a `TagType`.
     The recommended way of initialising a `TagTypes` object is via the factory
-    constructor `from_char`.
+    constructor `TagTypes.from_char`.
 
     For further information, refer to the [optional fields][tags] section of the SAM
     specifications.

@@ -4,6 +4,12 @@ A module for wrapping SAM-like optional fields (tags) generally used in PAF file
 
 The full specifications can he found [here][specs].
 
+The main class of interest in this module is `Tag`. It can be imported into your
+project like so
+
+```py
+from pafpy import Tag
+```
 [specs]: https://samtools.github.io/hts-specs/SAMtags.pdf
 
 Classes
@@ -20,12 +26,27 @@ Classes
 `Tag(tag: str, type: str, value: Union[str, float, int])`
 :   Class representing a single SAM-like optional field (tag).
     
+    There are two ways to construct a `Tag`:
+    
+    1. The default constructor, where you specify each member variable manually.
+    2. Using the `Tag.from_str` factory constructor method.
+    
+    > *Note: It is recommended that you construct tags using the `Tag.from_str`
+    constructor as it has some additional logic to ensure the type of the value is
+    inferred correctly.*
+    
     ## Example
     ```py
     from pafpy import Tag
     
+    # default constructor
     tag = Tag(tag="NM", type="i", value=50)
     assert str(tag) == "NM:i:50"
+    assert tag.value == 50
+    
+    # from_str factory constructor
+    tag_from_str = Tag.from_str("NM:i:50")
+    assert tag_from_str == tag
     ```
 
     ### Ancestors (in MRO)
@@ -89,7 +110,7 @@ Classes
     
     The value of each variant is a `TagType`.
     The recommended way of initialising a `TagTypes` object is via the factory
-    constructor `from_char`.
+    constructor `TagTypes.from_char`.
     
     For further information, refer to the [optional fields][tags] section of the SAM
     specifications.
@@ -100,7 +121,7 @@ Classes
     from pafpy import TagType, TagTypes
     
     tag_type = TagTypes.from_char("i")
-    assert tag_type == TagType.Integer
+    assert tag_type == TagTypes.Integer
     ```
     
     ## Errors
