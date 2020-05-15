@@ -91,3 +91,8 @@ class TestIterateFile:
             expected = [record1, record2]
 
             assert actual == expected
+
+    def test_call_next_on_closed_file_raises_error(self):
+        paf = PafFile(path="foo")
+        with pytest.raises(IOError):
+            next(paf)
