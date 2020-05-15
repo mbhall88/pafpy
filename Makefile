@@ -1,5 +1,7 @@
 PROJECT = pafpy
 COVG_REPORT = htmlcov/index.html
+DOCS_DIR = docs/
+DOCS_TEMPLATE = docs/templates/
 OS := $(shell uname -s)
 # MAIN #########################################################################
 
@@ -7,7 +9,6 @@ OS := $(shell uname -s)
 all: install
 
 # DEPENDENCIES #################################################################
-
 .PHONY: install
 install:
 	poetry install
@@ -51,7 +52,21 @@ endif
 .PHONY: precommit
 precommit: fmt lint test
 
+# DOCS ########################################################################
+.PHONY: build-docs
+build-docs:
+	poetry run pdoc --template-dir $(DOCS_TEMPLATE) \
+	  --html --force --output-dir $(DOCS_DIR) $(PROJECT) && \
+	mv $(DOCS_DIR)/$(PROJECT)/* $(DOCS_DIR)/
+
+.PHONY: docs
+docs: build-docs clean
+
+.PHONY: serve-docs
+serve-docs:
+	poetry run pdoc --template-dir $(DOCS_TEMPLATE) --http : $(PROJECT)
+
 # CLEANUP ######################################################################
 .PHONY: clean
 clean:
-	rm -f tests/test_docs.py
+	rm -rf tests/test_docs.py $(DOCS_DIR)/$(PROJECT)/
