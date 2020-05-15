@@ -8,7 +8,7 @@ maintainers = ["Michael Hall <michael@mbh.sh>"]
 readme = "README.md"
 homepage = "https://github.com/mbhall88/pafpy"
 repository = "https://github.com/mbhall88/pafpy"
-documentation = #todo
+documentation = "https://pafpy.xyz"
 keywords = ["paf", "python", "bioinformatics", "library", "alignment"]
 classifiers = [
     "Intended Audience :: Science/Research",

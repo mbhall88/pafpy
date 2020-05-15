@@ -40,13 +40,19 @@ make test-code
 
 [poetry]: https://python-poetry.org/
 [PAF]: https://github.com/lh3/miniasm/blob/master/PAF.md
-[docs]: #TODO
+[docs]: https://pafpy.xyz
 [blast]: https://lh3.github.io/2018/11/25/on-the-definition-of-sequence-identity#blast-identity
 [contribute]: https://github.com/mbhall88/pafpy/blob/master/CONTRIBUTING.md
 
 .. include:: ../CONTRIBUTING.md
 """
 from pafpy.paffile import PafFile  # noqa: F401
-from pafpy.pafrecord import PafRecord, MalformattedRecord, AlignmentType   # noqa: F401
+from pafpy.pafrecord import AlignmentType, MalformattedRecord, PafRecord  # noqa: F401
 from pafpy.strand import Strand  # noqa: F401
-from pafpy.tag import Tag, TagType, TagTypes, InvalidTagFormat, UnknownTagTypeChar  # noqa: F401
+from pafpy.tag import (  # noqa: F401
+    InvalidTagFormat,
+    Tag,
+    TagType,
+    TagTypes,
+    UnknownTagTypeChar,
+)

@@ -8,7 +8,7 @@ A lightweight library for working with [PAF][PAF] (Pairwise mApping Format) file
 ![License](https://img.shields.io/github/license/mbhall88/pafpy)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-**Documentation**: <insert URL when I have it> <!--TODO-->
+**Documentation**: <https://pafpy.xyz>
 
 [TOC]: #
 
@@ -98,7 +98,7 @@ If you would like to contribute to `pafpy`, checkout [`CONTRIBUTING.md`][contrib
 
 [poetry]: https://python-poetry.org/
 [PAF]: https://github.com/lh3/miniasm/blob/master/PAF.md
-[docs]: #TODO
+[docs]: https://pafpy.xyz/
 [blast]: https://lh3.github.io/2018/11/25/on-the-definition-of-sequence-identity#blast-identity
 [contribute]: https://github.com/mbhall88/pafpy/blob/master/CONTRIBUTING.md
 

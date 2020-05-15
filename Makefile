@@ -50,7 +50,7 @@ endif
 
 # PRECOMMIT ########################################################################
 .PHONY: precommit
-precommit: fmt lint test
+precommit: fmt lint test clean
 
 # DOCS ########################################################################
 .PHONY: build-docs
