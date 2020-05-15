@@ -89,11 +89,20 @@ code block annotated at `py` or `python`. See the code for examples. If the code
 documented can raise an exception, the type(s) of execptions should be documented in a
 `## Errors` section also.
 
-The documentation can be viewed by running
+The documentation can be served locally in a browser so that you can view changes in realtime by running
+
+```sh
+make serve-docs
+```
+
+and then navigating to the URL printed in the terminal (most likely <http://localhost:8080>).
+
+The docs can also be built by running
 
 ```sh
 make docs
 ```
+Then open `docs/index.html` to view the documentation that will be deployed on pushing to `master`.
 
 ## Committing
 
