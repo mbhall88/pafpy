@@ -1,4 +1,11 @@
-"""A module containing objects relating to the strand field within a PAF file."""
+"""A module containing objects relating to the strand field within a PAF file.
+
+The main class of interest here is `pafpy.strand.Strand`. To use it within your code, import it like so
+
+```py
+from pafpy import Strand
+```
+"""
 from enum import Enum
 
 

@@ -1,6 +1,6 @@
 """This module contains objects for working with PAF files.
 
-The main class of interest here is `PafFile`. It provides an interface to open/close
+The main class of interest here is `pafpy.paffile.PafFile`. It provides an interface to open/close
 a PAF file and to iterate over the alignment records within the file.
 
 To use `PafFile` within your code, import it like so

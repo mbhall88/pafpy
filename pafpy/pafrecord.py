@@ -1,7 +1,7 @@
 """This module contains objects for working with single alignment records within a PAF
 file.
 
-The main class of interest here is `PafRecord`. It provides a set of member
+The main class of interest here is `pafpy.pafrecord.PafRecord`. It provides a set of member
 variables relating to each field within the record, as well as some convenience methods
 for common tasks.
 

@@ -2,7 +2,7 @@
 
 The full specifications can he found [here][specs].
 
-The main class of interest in this module is `Tag`. It can be imported into your
+The main class of interest in this module is `pafpy.tag.Tag`. It can be imported into your
 project like so
 
 ```py

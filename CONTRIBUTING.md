@@ -15,7 +15,7 @@ of the standard development tasks are managed through a `Makefile`. The
 After cloning your fork locally and entering to project directory, you can setup the
 poetry environment with
 
-```shell
+```sh
 make install
 ```
 
@@ -23,7 +23,7 @@ make install
 
 All code is formatted with `black` and `isort`. To format the project, run
 
-```shell
+```sh
 make fmt
 ```
 
@@ -32,7 +32,7 @@ make fmt
 Linting is done by `flake8`. Please ensure there are no warnings prior to pushing any
 work.
 
-```shell
+```sh
 make lint
 ```
 
@@ -40,7 +40,7 @@ make lint
 
 To test both the code and documentation, run
 
-```shell
+```sh
 make test
 ```
 
@@ -50,7 +50,7 @@ All unit tests are contained in the `tests` directory. If you add any code, plea
 ensure it is tested. Tests are handled by `pytest`. To test just the code, without the
 also testing the documentation, run
 
-```shell
+```sh
 make test-code
 ```
 
@@ -61,7 +61,7 @@ script will extract all markdown python code blocks from docstrings in python fi
 write a test file with a unit test for each snippet. It then runs `pytest` on this file
 to ensure all code examples in the docstrings are correct. To test the docs, run
 
-```shell
+```sh
 make test-docs
 ```
 
@@ -70,7 +70,7 @@ make test-docs
 Please try and keep the project's code coverage as high as possible. To check the code
 covergae, run
 
-```shell
+```sh
 make coverage
 ```
 
@@ -83,7 +83,7 @@ The code is documented using markdown docstrings. The convention this project fo
 akin to that used by the Rust programming language. The beginning of the docstring
 should explain what the function does and if it returns anything. This is followed,
 where relevant, by an example section `## Example`. All examples should be valid,
-self-contained examples that can be copied and pasted in to a python shell and executed
+self-contained examples that can be copied and pasted in to a python sh and executed
 successfully (assuming the user has `pafpy` installed). These code snippets must be in a
 code block annotated at `py` or `python`. See the code for examples. If the code being
 documented can raise an exception, the type(s) of execptions should be documented in a
@@ -91,7 +91,7 @@ documented can raise an exception, the type(s) of execptions should be documente
 
 The documentation can be viewed by running
 
-```shell
+```sh
 make docs
 ```
 
@@ -100,7 +100,7 @@ make docs
 There is a convenience rule in the `Makefile` that can be run prior to committing that
 will run most of the above tasks for you
 
-```shell
+```sh
 make precommit
 ```
 
