@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pafpy"
-version = "0.1.0"
+version = "0.1.1"
 description = "A lightweight library for working with PAF (Pairwise mApping Format) files"
 license = "Unlicense"
 authors = ["Michael Hall <michael@mbh.sh>"]
