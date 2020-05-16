@@ -28,8 +28,6 @@ check-fmt:
 	poetry run isort --check-only tests/*.py $(PROJECT)/*.py
 	poetry run black --check .
 
-# BUILD ########################################################################
-
 # TEST ########################################################################
 .PHONY: test-code
 test-code: clean
@@ -79,3 +77,10 @@ serve-docs:
 .PHONY: clean
 clean:
 	rm -rf tests/test_docs.py $(DOCS_DIR)/$(PROJECT)/
+
+# BUILD ########################################################################
+.PHONY: build
+build:
+	poetry build
+
+# PUBLISH ########################################################################
