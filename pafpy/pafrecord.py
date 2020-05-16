@@ -45,8 +45,9 @@ class PafRecord(NamedTuple):
 
     There are two ways to construct a `PafRecord`:
     
-    1. The default constructor, where you specify each member variable manually.
-    2. Using the `PafRecord.from_str` factory constructor method.
+    1. The default constructor: where you specify each member variable manually.
+    2. The `PafRecord.from_str` factory constructor: where you create a
+       `PafRecord` directly from a `str`.
 
     ## Example
     ```py
@@ -258,9 +259,9 @@ class PafRecord(NamedTuple):
         BLAST identity is defined as the number of matching bases (`PafRecord.mlen`)
         over the number of alignment columns (`PafRecord.blen`).
 
-         > *Note: If your PAF file was generated from minimap2, it is strongly advised
+         > *Note: If your PAF file was produced by minimap2, it is strongly advised
         that you ensure either the `-c` or `--cs` options were used when generating the
-        alignment, otherwise the BLAST identity will be very inaccurate. See the
+        alignment; otherwise the BLAST identity will be very inaccurate. See the
         [minimap2 FAQ][faq] for more information.*
 
         ## Example
@@ -284,7 +285,7 @@ class PafRecord(NamedTuple):
     def is_unmapped(self) -> bool:
         """Is the record unmapped?
 
-        A record is considered unmapped if the strand is '*'
+        A record is considered unmapped if the strand is `*`
         (`pafpy.strand.Strand.Unmapped`) - as per the minimap2
         [`--paf-no-hit`][io-opts] parameter behaviour.
 
@@ -392,7 +393,7 @@ class PafRecord(NamedTuple):
         return aln_type is AlignmentType.Inversion
 
     def get_tag(self, tag: str, default: Optional[Tag] = None) -> Optional[Tag]:
-        """Retreive a tag from the record if it is present. Otherwise, return `default`.
+        """Retrieve a tag from the record if it is present; otherwise, return `default`.
 
         If `default` is not specified, `None` will be used as the default.
 

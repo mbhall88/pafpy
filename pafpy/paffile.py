@@ -24,7 +24,7 @@ class PafFile:
     The file is *not* automatically opened. After construction, it can be opened in
     one of two ways:
 
-    1. Manually, with `PafFile.open`. Rememeber to close the file when finished.
+    1. Manually, with `PafFile.open`. Remember to close the file when finished.
     2. Via a context manager (`with`) block.
 
     ## Example

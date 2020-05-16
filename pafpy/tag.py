@@ -1,6 +1,6 @@
 """A module for wrapping SAM-like optional fields (tags) generally used in PAF files.
 
-The full specifications can he found [here][specs].
+The full specifications can be found [here][specs].
 
 The main class of interest in this module is `pafpy.tag.Tag`. It can be imported into your
 project like so
