@@ -45,6 +45,7 @@ make test-code
 
 .. include:: ../CONTRIBUTING.md
 """
+from pafpy.__version__ import __version__  # noqa: F401
 from pafpy.paffile import PafFile  # noqa: F401
 from pafpy.pafrecord import AlignmentType, MalformattedRecord, PafRecord  # noqa: F401
 from pafpy.strand import Strand  # noqa: F401
