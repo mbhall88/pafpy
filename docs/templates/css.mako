@@ -51,6 +51,7 @@
   h1 {
     font-size: 2.5em;
     line-height: 1.1em;
+    color: #81a1c1;
   }
   h2 {
     font-size: 1.75em;
@@ -66,7 +67,8 @@
   }
 
   a {
-    color: #058;
+    color: #bf616a;
+    font-weight: 700;
     text-decoration: none;
     transition: color .3s ease-in-out;
   }
@@ -85,19 +87,19 @@
   }
 
   pre code {
-    background: #f8f8f8;
-    font-size: .8em;
-    line-height: 1.4em;
+    font-size: 1em;
+    line-height: 1.3em;
   }
   code {
     background: #f2f2f1;
     padding: 1px 4px;
     overflow-wrap: break-word;
+    font-family: JetBrainsMono,Menlo,monospace;
   }
   h1 code { background: transparent }
 
   pre {
-    background: #f8f8f8;
+    background: #2E3440;
     border: 0;
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
@@ -114,9 +116,6 @@
   }
 
   pre code {
-  font-size: 1em;
-  line-height: 1.3em;
-  font-family: JetBrainsMono,Menlo,monospace;
   }
 
   #http-server-module-list {
@@ -341,10 +340,10 @@
       font-family: JetBrainsMono,Menlo,monospace;
     }
 
-    /* colour surround code block */
-    pre {
-        background: #2E3440;
-    }
+  /* colour surround code block */
+  pre {
+      background: #2E3440;
+  }
 
     .item .name {
       font-size: 1em;
