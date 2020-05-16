@@ -3,6 +3,9 @@ COVG_REPORT = htmlcov/index.html
 DOCS_DIR = docs/
 DOCS_TEMPLATE = docs/templates/
 OS := $(shell uname -s)
+VERSION := $(shell poetry version | grep -P '(?P<version>\d.\d.\d)' --only-matching)
+BOLD := $(shell tput bold)
+NORMAL := $(shell tput sgr0)
 # MAIN #########################################################################
 
 .PHONY: all
@@ -83,4 +86,9 @@ clean:
 build:
 	poetry build
 
-# PUBLISH ########################################################################
+# TAG ########################################################################
+# prints out the commands to run to tag the release and push it
+.PHONY: tag
+tag:
+	@echo "Run $(BOLD)git tag -a $(VERSION) -m <message>$(NORMAL) to tag the release"
+	@echo "Then run $(BOLD)git push origin $(VERSION)$(NORMAL) to push the tag"
