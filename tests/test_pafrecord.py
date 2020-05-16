@@ -507,6 +507,10 @@ class TestIsPrimary:
         with pytest.raises(ValueError):
             PafRecord(strand=Strand.Forward, tags={tag.tag: tag}).is_primary()
 
+    def test_tp_tag_not_present_in_mapped_record_raises_error(self):
+        with pytest.raises(ValueError):
+            PafRecord(strand=Strand.Reverse).is_primary()
+
 
 class TestIsSecondary:
     def test_unmapped_record(self):
@@ -537,6 +541,10 @@ class TestIsSecondary:
         with pytest.raises(ValueError):
             PafRecord(strand=Strand.Forward, tags={tag.tag: tag}).is_secondary()
 
+    def test_tp_tag_not_present_in_mapped_record_raises_error(self):
+        with pytest.raises(ValueError):
+            PafRecord(strand=Strand.Reverse).is_secondary()
+
 
 class TestIsInversion:
     def test_unmapped_record(self):
@@ -566,3 +574,7 @@ class TestIsInversion:
         tag = Tag.from_str("tp:A:?")
         with pytest.raises(ValueError):
             PafRecord(strand=Strand.Forward, tags={tag.tag: tag}).is_inversion()
+
+    def test_tp_tag_not_present_in_mapped_record_raises_error(self):
+        with pytest.raises(ValueError):
+            PafRecord(strand=Strand.Reverse).is_inversion()

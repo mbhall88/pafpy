@@ -393,8 +393,11 @@ class PafRecord(NamedTuple):
         if self.is_unmapped():
             return False
 
-        aln_tag = self.get_tag("tp", default=Tag.from_str("tp:A:*"))
-        aln_type = AlignmentType(aln_tag.value[0].upper())
+        aln_tag = self.get_tag("tp")
+        if aln_tag is None:
+            raise ValueError("tp tag not in record.")
+        else:
+            aln_type = AlignmentType(aln_tag.value[0].upper())
 
         return aln_type is AlignmentType.Inversion
 
