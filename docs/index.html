@@ -25,9 +25,11 @@
 </header>
 <section id="section-intro">
 <p>A lightweight library for working with <a href="https://github.com/lh3/miniasm/blob/master/PAF.md">PAF</a> (Pairwise mApping Format) files.</p>
-<!--[![GitHub Workflow Status](<https://img.shields.io/github/workflow/status/mbhall88/pafpy/Python_package>)](<https://github.com/mbhall88/pafpy/actions>)-->
-<!--[![codecov](<https://codecov.io/gh/mbhall88/pafpy/branch/master/graph/badge.svg>)](<https://codecov.io/gh/mbhall88/pafpy>)-->
-<p><img alt="License" src="https://img.shields.io/github/license/mbhall88/pafpy">
+<p><a href="https://github.com/mbhall88/pafpy/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/mbhall88/pafpy/Python_package"></a>
+<a href="https://codecov.io/gh/mbhall88/pafpy"><img alt="codecov" src="https://codecov.io/gh/mbhall88/pafpy/branch/master/graph/badge.svg"></a>
+<a href="https://pypi.org/project/pafpy/"><img alt="PyPI" src="https://img.shields.io/pypi/v/pafpy"></a>
+<img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/pafpy">
+<img alt="License" src="https://img.shields.io/github/license/mbhall88/pafpy">
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a></p>
 <h1 id="install">Install</h1>
 <h3 id="pypi">PyPi</h3>
@@ -294,9 +296,10 @@ will run most of the above tasks for you</p>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;A lightweight library for working with [PAF][PAF] (Pairwise mApping Format) files.
 
-&lt;!--[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mbhall88/pafpy/Python_package)](https://github.com/mbhall88/pafpy/actions)--&gt;
-&lt;!--[![codecov](https://codecov.io/gh/mbhall88/pafpy/branch/master/graph/badge.svg)](https://codecov.io/gh/mbhall88/pafpy)--&gt;
-
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mbhall88/pafpy/Python_package)](https://github.com/mbhall88/pafpy/actions)
+[![codecov](https://codecov.io/gh/mbhall88/pafpy/branch/master/graph/badge.svg)](https://codecov.io/gh/mbhall88/pafpy)
+[![PyPI](https://img.shields.io/pypi/v/pafpy)](https://pypi.org/project/pafpy/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pafpy)
 ![License](https://img.shields.io/github/license/mbhall88/pafpy)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -340,16 +343,11 @@ make test-code
 
 .. include:: ../CONTRIBUTING.md
 &#34;&#34;&#34;
+from pafpy.__version__ import __version__  # noqa: F401
 from pafpy.paffile import PafFile  # noqa: F401
 from pafpy.pafrecord import AlignmentType, MalformattedRecord, PafRecord  # noqa: F401
 from pafpy.strand import Strand  # noqa: F401
-from pafpy.tag import (  # noqa: F401
-    InvalidTagFormat,
-    Tag,
-    TagType,
-    TagTypes,
-    UnknownTagTypeChar,
-)</code></pre>
+from pafpy.tag import InvalidTagFormat, Tag, TagType, UnknownTagTypeChar  # noqa: F401</code></pre>
 </details>
 </section>
 <section>
