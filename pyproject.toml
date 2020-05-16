@@ -37,6 +37,9 @@ line_length = 88
 line_length = 88
 multi_line_output = 3
 
+[tool.coverage.run]
+omit = ["*__.py"]
+
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"

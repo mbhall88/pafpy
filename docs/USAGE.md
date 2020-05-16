@@ -82,7 +82,7 @@ path = "path/to/sample.paf"
 
 with PafFile(path) as paf:
     record = next(paf)
-# do something with our lonely record
+# do something with your lonely record
 ```
 
 ### Working with strands
@@ -203,7 +203,7 @@ try:
     tag = Tag.from_str("NM:i:foo")
 except InvalidTagFormat as err:
     err_msg = str(err)
-assert err_msg == "NM:i:foo is not in the correct tag format."
+assert err_msg == "VALUE of tag NM:i:foo is not the expected TYPE"
 ```
 
 [blast]: https://lh3.github.io/2018/11/25/on-the-definition-of-sequence-identity#blast-identity
