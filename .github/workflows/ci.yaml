@@ -1,0 +1,46 @@
+# todo
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python_package
+
+on:
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches: [ master, dev ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run:  |
+              python -m pip install --upgrade pip
+              python -m pip install poetry
+              poetry install --no-interaction
+      - name: Check formatting with black
+        run:  make check-fmt
+      - name: Lint with flake8
+        run:  make lint
+      - name: Test and generate coverage report with pytest
+        run:  |
+              make test-ci
+              make test-docs
+              make clean
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file:             ./coverage.xml
+          flags:            unittests
+          fail_ci_if_error: true

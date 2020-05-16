@@ -16,12 +16,17 @@ install:
 # TIDY #################################################################
 .PHONY: fmt
 fmt: clean
-	poetry run isort --apply --atomic tests/*.py $(PROJECT)/*.py
+	poetry run isort --apply tests/*.py $(PROJECT)/*.py
 	poetry run black .
 
 .PHONY: lint
 lint: clean
 	poetry run flake8 .
+
+.PHONY: check-fmt
+check-fmt:
+	poetry run isort --check-only tests/*.py $(PROJECT)/*.py
+	poetry run black --check .
 
 # BUILD ########################################################################
 
@@ -47,6 +52,10 @@ else ifeq ($(OS), Darwin)
 else
 	echo "ERROR: Unknown OS detected - $OS"
 endif
+
+.PHONY: test-ci
+test-ci:
+	poetry run pytest --cov=$(PROJECT) --cov-report=xml --cov-branch tests/
 
 # PRECOMMIT ########################################################################
 .PHONY: precommit

@@ -35,7 +35,6 @@ line_length = 88
 
 [tool.isort]
 line_length = 88
-multi_line_output = 3
 
 [tool.coverage.run]
 omit = ["*__.py"]
