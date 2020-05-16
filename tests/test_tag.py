@@ -1,6 +1,6 @@
 import pytest
 
-from pafpy.tag import InvalidTagFormat, Tag, TagTypes, UnknownTagTypeChar
+from pafpy.tag import InvalidTagFormat, Tag
 
 
 class TestStr:
@@ -112,57 +112,5 @@ class TestFromStr:
 
         actual = Tag.from_str(string)
         expected = Tag(tag, tag_type, value)
-
-        assert actual == expected
-
-
-class TestTagTypesFromChar:
-    def test_empty_string_raises_error(self):
-        char = ""
-
-        with pytest.raises(UnknownTagTypeChar):
-            TagTypes.from_char(char)
-
-    def test_unknown_char_raises_error(self):
-        char = "?"
-
-        with pytest.raises(UnknownTagTypeChar):
-            TagTypes.from_char(char)
-
-    def test_too_many_characters_raises_error(self):
-        char = "AZ"
-
-        with pytest.raises(UnknownTagTypeChar):
-            TagTypes.from_char(char)
-
-    def test_character_returns_expected(self):
-        char = "A"
-
-        actual = TagTypes.from_char(char)
-        expected = TagTypes.Character
-
-        assert actual == expected
-
-    def test_integer_returns_expected(self):
-        char = "i"
-
-        actual = TagTypes.from_char(char)
-        expected = TagTypes.Integer
-
-        assert actual == expected
-
-    def test_float_returns_expected(self):
-        char = "f"
-
-        actual = TagTypes.from_char(char)
-        expected = TagTypes.RealNumber
-
-        assert actual == expected
-
-    def test_string_returns_expected(self):
-        char = "Z"
-
-        actual = TagTypes.from_char(char)
-        expected = TagTypes.String
 
         assert actual == expected
