@@ -53,7 +53,7 @@ make test-code
 ## Usage
 
 For full usage, please refer to the [documentation][docs]. If there is any functionality
-you feel is missing, or would make `pafpy` more user-friendly, please raise an issue
+you feel is missing or would make `pafpy` more user-friendly, please raise an issue
 with a feature request.
 
 In the below basic usage pattern, we collect the [BLAST identity][blast] of all primary

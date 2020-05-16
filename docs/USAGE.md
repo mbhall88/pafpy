@@ -1,6 +1,6 @@
 # Usage
 
-If there is any functionality you feel is missing, or would make `pafpy` more
+If there is any functionality you feel is missing or would make `pafpy` more
 user-friendly, please [raise an issue][issue] with a feature request.
 
 ## Basic
@@ -45,10 +45,11 @@ with PafFile(path) as paf:
 
 ### Manual open/close
 
-Sometimes a `with` context manager is not appropriate and you would like to manually
-open the file and pass it around. This can be achieved using the
+Sometimes a `with` context manager is not appropriate, and you would like to open the
+file and pass it around manually.. This can be achieved using the
 `pafpy.paffile.PafFile.open` and `pafpy.paffile.PafFile.close` methods. As an example,
-let's say we define a function that takes a `pafpy.paffile.PafFile` and counts the number of records in it.
+let's say we define a function that takes a `pafpy.paffile.PafFile` and counts the
+number of records in it.
 
 ```py
 from pafpy import PafFile
@@ -66,11 +67,13 @@ paf.close()
 assert paf.closed
 ```
 
-Admittedly, this is a contrived example and we could have still used the context manager, but you get the point 😉.
+Admittedly, this is a contrived example, and we could have still used the context
+manager, but you get the point 😉.
 
 ### Fetch individual records
 
-`for` loops aren't the only way of retrieving records in a file. You can also ask for records manually.
+`for` loops aren't the only way of retrieving records in a file. You can also ask for
+records manually.
 
 ```py
 from pafpy import PafFile
@@ -84,7 +87,9 @@ with PafFile(path) as paf:
 
 ### Working with strands
 
-There is a special enum for representing the strand field - `pafpy.strand.Strand`. This has a couple of advantages over just using a `str`, but the main one if readability. Let's count the number of records that mapped to the reverse strand.
+There is an enum for representing the strand field - `pafpy.strand.Strand`. It has a
+couple of advantages over just using a `str`, but the main one is readability. Let's
+count the number of records that mapped to the reverse strand.
 
 ```py
 from pafpy import PafFile, Strand
@@ -110,14 +115,18 @@ assert str(Strand.Unmapped) == "*"
 
 ### PAF records
 
-The object you will likely spend most time with is `pafpy.pafrecord.PafRecord`. Refer to
-the API docs for documentation on all the functions and member variables this class contains.
+The object you will likely spend the most time with is `pafpy.pafrecord.PafRecord`.
+Refer to the [API docs][api-docs] for documentation on all the functions and member
+variables this class contains.
 
-Let's look at a few use cases though. Construction of `PafRecord`s is quite flexible as we wanted to make it very easy to write unit tests and construct arbitrary records without having to construct and entire PAF file just to do so.  
+Let's look at a few use cases. Construction of `PafRecord`s is quite flexible as we
+wanted to make it very easy to write unit tests and construct arbitrary records without
+having to create an entire PAF file to do so.  
 There are two ways to construct a `PafRecord`:
 
-1. The default constructor, where you specify each member variable manually.
-2. Using the `pafpy.pafrecord.PafRecord.from_str` factory constructor method.
+1. The default constructor: where you specify each member variable manually.
+2. The `pafpy.pafrecord.PafRecord.from_str` factory constructor: where you create a
+   `PafRecord` directly from a `str`.
 
 ```py
 from pafpy import PafRecord, Strand, Tag
@@ -148,7 +157,10 @@ assert record1 == record2
 
 ### SAM-like optional fields/tags
 
-Each additional column after the 12th column in a PAF file is a [SAM-like tag][tag]. The `pafpy.tag.Tag` class tries to make working with tags much easier. You can extract these from a `PafRecord` using `pafpy.pafrecord.PafRecord.get_tag` or you may like to construct one yourself.  
+Each additional column after the 12th column in a PAF file is a [SAM-like tag][tag]. The
+`pafpy.tag.Tag` class tries to make working with tags simple. You can extract tags
+from a `PafRecord` using `pafpy.pafrecord.PafRecord.get_tag`, or you may like to
+construct one yourself.  
 Let's look at some of these options.
 
 ```py
@@ -163,14 +175,19 @@ assert tag.type == "i"
 assert tag.value == 8
 
 # we can construct tags from scratch with a str
-tag = Tag.from_str("tp:A:P"
+tag = Tag.from_str("tp:A:P")
 assert tag.value == "P"
 
 # or with the default constructor
 tag = Tag(tag="de", type="f", value=0.2)
 ```
 
-One thing to notice is that the `value` is in the correct type as specified in the [tag specs][tag]. However, if you define a `Tag` with the default constructor, you can bypass this. The `pafpy.tag.Tag.from_str` method validates the tag string to ensure it strictly matches the specifications. As such, we recommend using this method when constructing tags. But, there may be cases where you don't want to adhere to this convention, and in those cases, use the default constructor.
+One thing to notice is that the `value` is in the correct type as specified in the [tag
+specs][tag]. However, if you define a `Tag` with the default constructor, you can bypass
+this. The `pafpy.tag.Tag.from_str` method validates the tag string to ensure it strictly
+matches the specifications. As such, we recommend using this method when constructing
+tags. But, there may be cases where you don't want to adhere to this convention, and in
+those cases, use the default constructor.
 
 ```py
 from pafpy import Tag, InvalidTagFormat
@@ -192,4 +209,5 @@ assert err_msg == "NM:i:foo is not in the correct tag format."
 [blast]: https://lh3.github.io/2018/11/25/on-the-definition-of-sequence-identity#blast-identity
 [issue]: https://github.com/mbhall88/pafpy/issues
 [tag]: https://samtools.github.io/hts-specs/SAMtags.pdf
+[api-docs]: https://pafpy.xyz/#header-submodules
 
