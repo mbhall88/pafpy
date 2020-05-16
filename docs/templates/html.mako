@@ -379,8 +379,8 @@
     <title>Python module list</title>
     <meta name="description" content="A list of documented Python modules." />
   % else:
-    <title>${module.name} API documentation</title>
-    <meta name="description" content="${module.docstring | glimpse, trim, h}" />
+    <title>${module.name}</title>
+    <meta name="description" content="A lightweight library for working with PAF (Pairwise mApping Format) files." />
   % endif
 
   <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
