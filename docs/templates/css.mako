@@ -287,6 +287,19 @@
     .admonition.caution {
       background: lightpink;
     }
+
+  /* Change the styline of markdown > quotes */
+  blockquote {
+      background: #eceff4;
+      border-left: 10px solid #d8dee9;
+      margin: 1.5em 10px;
+      padding: 0.5em 10px;
+      quotes: "\201C""\201D""\2018""\2019";
+      color: #4c566a;
+  }
+  blockquote p {
+      display: inline;
+  }
 </%def>
 
 <%def name="desktop()" filter="minify_css">
@@ -361,6 +374,19 @@
       margin-top: .5em;
     }
   }
+
+  /* Change the styline of markdown > quotes */
+    blockquote {
+      background: #eceff4;
+      border-left: 10px solid #d8dee9;
+      margin: 1.5em 10px;
+      padding: 0.5em 10px;
+      quotes: "\201C""\201D""\2018""\2019";
+      color: #4c566a;
+    }
+    blockquote p {
+        display: inline;
+    }
 </%def>
 
 <%def name="print()" filter="minify_css">
