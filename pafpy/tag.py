@@ -51,7 +51,7 @@ TagTypes = {
     "f": TagType(
         char="f",
         python_type=float,
-        value_regex=re.compile(r"(?P<value>[-+]?\d*\.?\d+([eE][-+]?\d+)?)"),
+        value_regex=re.compile(r"(?P<value>[-+]?(\d*\.?\d+([eE][-+]?\d+)?)|inf)"),
     ),
     "Z": TagType(
         char="Z", python_type=str, value_regex=re.compile(r"(?P<value>[ !-~]*)"),
