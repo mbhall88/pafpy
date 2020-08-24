@@ -114,3 +114,14 @@ class TestFromStr:
         expected = Tag(tag, tag_type, value)
 
         assert actual == expected
+
+    def test_tag_with_inf_float_value_parsed(self):
+        tag = "de"
+        tag_type = "f"
+        value = "inf"
+        string = ":".join([tag, tag_type, str(value)])
+
+        actual = Tag.from_str(string)
+        expected = Tag(tag, tag_type, float(value))
+
+        assert actual == expected
