@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ##  [Unreleased]
 
+##  [0.1.2]
+
 ### Fixed
 
 - handle `inf` float values ([@lucventurini](https://github.com/lucventurini))
@@ -22,4 +24,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Don't rely on `poetry` to get version.
 
 [Unreleased]: https://github.com/snakemake/snakefmt/compare/0.1.1...HEAD
-[0.1.1]: https://github.com/mbhall88/pafpy/compare/0.1.0...0.1.1
+[0.1.2]: https://github.com/mbhall88/pafpy/releases/tag/0.1.2
+[0.1.1]: https://github.com/mbhall88/pafpy/releases/tag/0.1.1
