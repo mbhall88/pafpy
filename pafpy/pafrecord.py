@@ -111,7 +111,7 @@ class PafRecord(NamedTuple):
     It is recommended to use `PafRecord.get_tag` to retrieve individual tags."""
 
     def __str__(self) -> str:
-        tag_str = "" if self.tags is None else DELIM.join(self.tags)
+        tag_str = "" if self.tags is None else DELIM.join(map(str, self.tags.values()))
         fields = [
             self.qname,
             self.qlen,

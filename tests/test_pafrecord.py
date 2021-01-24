@@ -29,7 +29,7 @@ class TestStr:
                 str(x) for x in PafRecord._field_defaults.values() if x is not None
             )
             + DELIM
-            + DELIM.join(tags)
+            + DELIM.join(map(str, tags.values()))
         )
 
         assert actual == expected
