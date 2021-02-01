@@ -253,6 +253,3 @@ pip-selfcheck.json
 
 # End of https://www.gitignore.io/api/linux,macos,python,jetbrains,virtualenv
 .idea/
-
-# ignore PAF files
-*.paf

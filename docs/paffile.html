@@ -45,11 +45,15 @@ To use `PafFile` within your code, import it like so
 from pafpy import PafFile
 ```
 &#34;&#34;&#34;
+import gzip
+import io
 import os
+import sys
 from pathlib import Path
-from typing import Optional, TextIO, Union
+from typing import IO, Optional, TextIO, Union
 
 from pafpy.pafrecord import PafRecord
+from pafpy.utils import is_compressed
 
 PathLike = Union[Path, str, os.PathLike]
 
@@ -57,11 +61,19 @@ PathLike = Union[Path, str, os.PathLike]
 class PafFile:
     &#34;&#34;&#34;Stream access to a PAF file.
 
-    The file is *not* automatically opened. After construction, it can be opened in
-    one of two ways:
+    `fileobj` is an object to read the PAF file from. Can be a `str`, `pathlib.Path`,
+    or an opened file ([file object](https://docs.python.org/3/glossary.html#term-file-object)).
+
+    &gt; *Note: to use stdin, pass `fileobj=&#34;-&#34;`*. See the usage docs for more details.
+
+    The file is *not* automatically opened - unless already open. After construction,
+    it can be opened in one of two ways:
 
     1. Manually, with `PafFile.open`. Remember to close the file when finished.
     2. Via a context manager (`with`) block.
+
+    If an already-open `fileobj` is given, the `PafFile` can be iterated without the
+    need to open it.
 
     ## Example
     ```py
@@ -94,10 +106,16 @@ class PafFile:
     `pafpy.pafrecord.PafRecord` objects.
     &#34;&#34;&#34;
 
-    def __init__(self, path: PathLike):
-        self.path = Path(path)
-        &#34;&#34;&#34;Path to the PAF file. Can be a `str` or a `pathlib.Path` object.&#34;&#34;&#34;
-        self._stream: Optional[TextIO] = None
+    def __init__(self, fileobj: Union[PathLike, IO]):
+        if isinstance(fileobj, io.IOBase):
+            self._stream = fileobj
+            self.path = None
+            self._is_stdin = False
+        else:
+            self._stream: Optional[TextIO] = None
+            self.path = Path(fileobj) if not str(fileobj) == &#34;-&#34; else None
+            self._is_stdin = self.path is None
+            &#34;&#34;&#34;Path to the PAF file. If `fileobj` is an open file object, then `path` will be `None` .&#34;&#34;&#34;
 
     def __del__(self):
         self.close()
@@ -112,9 +130,32 @@ class PafFile:
         return self
 
     def __next__(self) -&gt; PafRecord:
-        if self.closed:
+        if self.closed and self._is_stdin:
+            self.open()
+        elif self.closed:
             raise IOError(&#34;PAF file is closed - cannot get next element.&#34;)
-        return PafRecord.from_str(next(self._stream))
+        line = next(self._stream)
+        if isinstance(line, bytes):
+            line = line.decode()
+        return PafRecord.from_str(line)
+
+    def _open(self) -&gt; IO:
+        if self.path is not None:
+            with open(self.path, mode=&#34;rb&#34;) as fileobj:
+                file_is_compressed = is_compressed(fileobj)
+
+            if file_is_compressed:
+                return gzip.open(self.path)
+            else:
+                return open(self.path)
+        elif self._is_stdin:
+            return (
+                sys.stdin.buffer
+                if not is_compressed(sys.stdin.buffer)
+                else gzip.open(sys.stdin.buffer)
+            )
+        else:
+            return self._stream
 
     def open(self) -&gt; &#34;PafFile&#34;:
         &#34;&#34;&#34;Opens the PAF file to allow iterating over the records. Returns a `PafFile`
@@ -136,25 +177,32 @@ class PafFile:
         assert paf.closed
         ```
 
+        &gt; *Note: If the file is already open, the file position will be reset to the
+        beginning.*
+
         ## Errors
-        - If the file is already open, an `IOError` exception is raised.
         - If `path` does not exist, an `OSError` exception is raised.
         &#34;&#34;&#34;
         if not self.closed:
-            raise IOError(&#34;PafFile is already open.&#34;)
-        self._stream = self.path.open()
+            self._stream.seek(0)
+        else:
+            self._stream = self._open()
         return self
 
     @property
     def closed(self) -&gt; bool:
         &#34;&#34;&#34;Is the PAF file closed?&#34;&#34;&#34;
-        return self._stream is None or self._stream.closed
+        return self._stream is None
 
     def close(self):
         &#34;&#34;&#34;Close the `PafFile`.&#34;&#34;&#34;
         if not self.closed:
-            self._stream.close()
-            self._stream = None</code></pre>
+            try:
+                self._stream.close()
+            except AttributeError:  # happens if stream is stdin
+                pass
+            finally:
+                self._stream = None</code></pre>
 </details>
 </section>
 <section>
@@ -168,16 +216,23 @@ class PafFile:
 <dl>
 <dt id="pafpy.paffile.PafFile"><code class="flex name class">
 <span>class <span class="ident">PafFile</span></span>
-<span>(</span><span>path: Union[str, os.PathLike])</span>
+<span>(</span><span>fileobj: Union[str, os.PathLike, IO])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Stream access to a PAF file.</p>
-<p>The file is <em>not</em> automatically opened. After construction, it can be opened in
-one of two ways:</p>
+<p><code>fileobj</code> is an object to read the PAF file from. Can be a <code>str</code>, <code>pathlib.Path</code>,
+or an opened file (<a href="https://docs.python.org/3/glossary.html#term-file-object">file object</a>).</p>
+<blockquote>
+<p><em>Note: to use stdin, pass <code>fileobj="-"</code></em>. See the usage docs for more details.</p>
+</blockquote>
+<p>The file is <em>not</em> automatically opened - unless already open. After construction,
+it can be opened in one of two ways:</p>
 <ol>
 <li>Manually, with <code><a title="pafpy.paffile.PafFile.open" href="#pafpy.paffile.PafFile.open">PafFile.open()</a></code>. Remember to close the file when finished.</li>
 <li>Via a context manager (<code>with</code>) block.</li>
 </ol>
+<p>If an already-open <code>fileobj</code> is given, the <code><a title="pafpy.paffile.PafFile" href="#pafpy.paffile.PafFile">PafFile</a></code> can be iterated without the
+need to open it.</p>
 <h2 id="example">Example</h2>
 <pre><code class="py">from pafpy import PafFile, PafRecord
 from pathlib import Path
@@ -212,11 +267,19 @@ assert actual_records == expected_records
 <pre><code class="python">class PafFile:
     &#34;&#34;&#34;Stream access to a PAF file.
 
-    The file is *not* automatically opened. After construction, it can be opened in
-    one of two ways:
+    `fileobj` is an object to read the PAF file from. Can be a `str`, `pathlib.Path`,
+    or an opened file ([file object](https://docs.python.org/3/glossary.html#term-file-object)).
+
+    &gt; *Note: to use stdin, pass `fileobj=&#34;-&#34;`*. See the usage docs for more details.
+
+    The file is *not* automatically opened - unless already open. After construction,
+    it can be opened in one of two ways:
 
     1. Manually, with `PafFile.open`. Remember to close the file when finished.
     2. Via a context manager (`with`) block.
+
+    If an already-open `fileobj` is given, the `PafFile` can be iterated without the
+    need to open it.
 
     ## Example
     ```py
@@ -249,10 +312,16 @@ assert actual_records == expected_records
     `pafpy.pafrecord.PafRecord` objects.
     &#34;&#34;&#34;
 
-    def __init__(self, path: PathLike):
-        self.path = Path(path)
-        &#34;&#34;&#34;Path to the PAF file. Can be a `str` or a `pathlib.Path` object.&#34;&#34;&#34;
-        self._stream: Optional[TextIO] = None
+    def __init__(self, fileobj: Union[PathLike, IO]):
+        if isinstance(fileobj, io.IOBase):
+            self._stream = fileobj
+            self.path = None
+            self._is_stdin = False
+        else:
+            self._stream: Optional[TextIO] = None
+            self.path = Path(fileobj) if not str(fileobj) == &#34;-&#34; else None
+            self._is_stdin = self.path is None
+            &#34;&#34;&#34;Path to the PAF file. If `fileobj` is an open file object, then `path` will be `None` .&#34;&#34;&#34;
 
     def __del__(self):
         self.close()
@@ -267,9 +336,32 @@ assert actual_records == expected_records
         return self
 
     def __next__(self) -&gt; PafRecord:
-        if self.closed:
+        if self.closed and self._is_stdin:
+            self.open()
+        elif self.closed:
             raise IOError(&#34;PAF file is closed - cannot get next element.&#34;)
-        return PafRecord.from_str(next(self._stream))
+        line = next(self._stream)
+        if isinstance(line, bytes):
+            line = line.decode()
+        return PafRecord.from_str(line)
+
+    def _open(self) -&gt; IO:
+        if self.path is not None:
+            with open(self.path, mode=&#34;rb&#34;) as fileobj:
+                file_is_compressed = is_compressed(fileobj)
+
+            if file_is_compressed:
+                return gzip.open(self.path)
+            else:
+                return open(self.path)
+        elif self._is_stdin:
+            return (
+                sys.stdin.buffer
+                if not is_compressed(sys.stdin.buffer)
+                else gzip.open(sys.stdin.buffer)
+            )
+        else:
+            return self._stream
 
     def open(self) -&gt; &#34;PafFile&#34;:
         &#34;&#34;&#34;Opens the PAF file to allow iterating over the records. Returns a `PafFile`
@@ -291,25 +383,32 @@ assert actual_records == expected_records
         assert paf.closed
         ```
 
+        &gt; *Note: If the file is already open, the file position will be reset to the
+        beginning.*
+
         ## Errors
-        - If the file is already open, an `IOError` exception is raised.
         - If `path` does not exist, an `OSError` exception is raised.
         &#34;&#34;&#34;
         if not self.closed:
-            raise IOError(&#34;PafFile is already open.&#34;)
-        self._stream = self.path.open()
+            self._stream.seek(0)
+        else:
+            self._stream = self._open()
         return self
 
     @property
     def closed(self) -&gt; bool:
         &#34;&#34;&#34;Is the PAF file closed?&#34;&#34;&#34;
-        return self._stream is None or self._stream.closed
+        return self._stream is None
 
     def close(self):
         &#34;&#34;&#34;Close the `PafFile`.&#34;&#34;&#34;
         if not self.closed:
-            self._stream.close()
-            self._stream = None</code></pre>
+            try:
+                self._stream.close()
+            except AttributeError:  # happens if stream is stdin
+                pass
+            finally:
+                self._stream = None</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -323,12 +422,8 @@ assert actual_records == expected_records
 <pre><code class="python">@property
 def closed(self) -&gt; bool:
     &#34;&#34;&#34;Is the PAF file closed?&#34;&#34;&#34;
-    return self._stream is None or self._stream.closed</code></pre>
+    return self._stream is None</code></pre>
 </details>
-</dd>
-<dt id="pafpy.paffile.PafFile.path"><code class="name">var <span class="ident">path</span></code></dt>
-<dd>
-<div class="desc"><p>Path to the PAF file. Can be a <code>str</code> or a <code>pathlib.Path</code> object.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -345,8 +440,12 @@ def closed(self) -&gt; bool:
 <pre><code class="python">def close(self):
     &#34;&#34;&#34;Close the `PafFile`.&#34;&#34;&#34;
     if not self.closed:
-        self._stream.close()
-        self._stream = None</code></pre>
+        try:
+            self._stream.close()
+        except AttributeError:  # happens if stream is stdin
+            pass
+        finally:
+            self._stream = None</code></pre>
 </details>
 </dd>
 <dt id="pafpy.paffile.PafFile.open"><code class="name flex">
@@ -368,9 +467,12 @@ assert not paf.closed
 paf.close()
 assert paf.closed
 </code></pre>
+<blockquote>
+<p><em>Note: If the file is already open, the file position will be reset to the
+beginning.</em></p>
+</blockquote>
 <h2 id="errors">Errors</h2>
 <ul>
-<li>If the file is already open, an <code>IOError</code> exception is raised.</li>
 <li>If <code>path</code> does not exist, an <code>OSError</code> exception is raised.</li>
 </ul></div>
 <details class="source">
@@ -397,13 +499,16 @@ assert paf.closed
     assert paf.closed
     ```
 
+    &gt; *Note: If the file is already open, the file position will be reset to the
+    beginning.*
+
     ## Errors
-    - If the file is already open, an `IOError` exception is raised.
     - If `path` does not exist, an `OSError` exception is raised.
     &#34;&#34;&#34;
     if not self.closed:
-        raise IOError(&#34;PafFile is already open.&#34;)
-    self._stream = self.path.open()
+        self._stream.seek(0)
+    else:
+        self._stream = self._open()
     return self</code></pre>
 </details>
 </dd>
@@ -437,7 +542,6 @@ alt="logo" height="150" style="float: right;">
 <li><code><a title="pafpy.paffile.PafFile.close" href="#pafpy.paffile.PafFile.close">close</a></code></li>
 <li><code><a title="pafpy.paffile.PafFile.closed" href="#pafpy.paffile.PafFile.closed">closed</a></code></li>
 <li><code><a title="pafpy.paffile.PafFile.open" href="#pafpy.paffile.PafFile.open">open</a></code></li>
-<li><code><a title="pafpy.paffile.PafFile.path" href="#pafpy.paffile.PafFile.path">path</a></code></li>
 </ul>
 </li>
 </ul>
