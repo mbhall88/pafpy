@@ -149,7 +149,7 @@ class PafRecord(NamedTuple):
     It is recommended to use `PafRecord.get_tag` to retrieve individual tags.&#34;&#34;&#34;
 
     def __str__(self) -&gt; str:
-        tag_str = &#34;&#34; if self.tags is None else DELIM.join(self.tags)
+        tag_str = &#34;&#34; if self.tags is None else DELIM.join(map(str, self.tags.values()))
         fields = [
             self.qname,
             self.qlen,
@@ -658,7 +658,7 @@ assert record1 == record2
     It is recommended to use `PafRecord.get_tag` to retrieve individual tags.&#34;&#34;&#34;
 
     def __str__(self) -&gt; str:
-        tag_str = &#34;&#34; if self.tags is None else DELIM.join(self.tags)
+        tag_str = &#34;&#34; if self.tags is None else DELIM.join(map(str, self.tags.values()))
         fields = [
             self.qname,
             self.qlen,

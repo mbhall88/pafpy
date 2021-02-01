@@ -106,6 +106,40 @@ assert paf.closed
 </code></pre>
 <p>Admittedly, this is a contrived example, and we could have still used the context
 manager, but you get the point 😉.</p>
+<h3 id="compressed-input">Compressed input</h3>
+<p>If your PAF file has been compressed with <a href="https://www.gnu.org/software/gzip/manual/gzip.html"><code>gzip</code></a> you don't need to do anything -
+just pass the filepath as you would any other. Compression is tested by reading the
+first two bytes of the file, so the filepath doesn't even need a <code>.gz</code> extension.</p>
+<pre><code class="py">from pafpy import PafFile
+
+path = &quot;sample.paf.gz&quot;
+
+with PafFile(path) as paf:
+    for record in paf:
+        # do something with your records
+</code></pre>
+<h3 id="working-with-file-streamsobjects">Working with file streams/objects</h3>
+<p>An already-open file can also be used to construct a <code><a title="pafpy.paffile.PafFile" href="paffile.html#pafpy.paffile.PafFile">PafFile</a></code> object. If
+a <code>PafFile</code> is constructed with an open file like this there is no need to open the
+<code>PafFile</code>.</p>
+<pre><code class="py">with open(&quot;sample.paf&quot;) as fileobj:
+    paf = PafFile(fileobj)
+    # no need to open the paf
+    for record in paf:
+        # do something with record
+</code></pre>
+<p>If you want to use stdin as your PAF source, it is strongly recommended you use <code>"-"</code> to
+construct the <code>PafFile</code>. The library will auto-detect if stdin is compressed and will
+decompress it accordingly.</p>
+<pre><code class="py">paf = PafFile(&quot;-&quot;)
+# note: stdin is a stream so doesn't need to be opened
+for record in paf:
+    # do something with record
+</code></pre>
+<blockquote>
+<p>Advanced users: If you <strong>must</strong> use <code>sys.stdin</code> and not <code>"-"</code> then please pass
+<code>sys.stdin.buffer</code></p>
+</blockquote>
 <h3 id="fetch-individual-records">Fetch individual records</h3>
 <p><code>for</code> loops aren't the only way of retrieving records in a file. You can also ask for
 records manually.</p>
@@ -115,7 +149,7 @@ path = &quot;path/to/sample.paf&quot;
 
 with PafFile(path) as paf:
     record = next(paf)
-# do something with your lonely record
+    # do something with your lonely record
 </code></pre>
 <h3 id="working-with-strands">Working with strands</h3>
 <p>There is an enum for representing the strand field - <code><a title="pafpy.strand.Strand" href="strand.html#pafpy.strand.Strand">Strand</a></code>. It has a
@@ -178,9 +212,9 @@ assert record1 == record2
 </code></pre>
 <h3 id="sam-like-optional-fieldstags">SAM-like optional fields/tags</h3>
 <p>Each additional column after the 12th column in a PAF file is a <a href="https://samtools.github.io/hts-specs/SAMtags.pdf">SAM-like tag</a>. The
-<code><a title="pafpy.tag.Tag" href="tag.html#pafpy.tag.Tag">Tag</a></code> class tries to make working with tags simple. You can extract tags
-from a <code>PafRecord</code> using <code><a title="pafpy.pafrecord.PafRecord.get_tag" href="pafrecord.html#pafpy.pafrecord.PafRecord.get_tag">PafRecord.get_tag()</a></code>, or you may like to
-construct one yourself.<br>
+<code><a title="pafpy.tag.Tag" href="tag.html#pafpy.tag.Tag">Tag</a></code> class tries to make working with tags simple. You can extract tags from
+a <code>PafRecord</code> using <code><a title="pafpy.pafrecord.PafRecord.get_tag" href="pafrecord.html#pafpy.pafrecord.PafRecord.get_tag">PafRecord.get_tag()</a></code>, or you may like to construct
+one yourself.<br>
 Let's look at some of these options.</p>
 <pre><code class="py">from pafpy import PafRecord, Tag
 
@@ -389,6 +423,12 @@ project like so</p>
 <pre><code class="py">from pafpy import Tag
 </code></pre></div>
 </dd>
+<dt><code class="name"><a title="pafpy.utils" href="utils.html">pafpy.utils</a></code></dt>
+<dd>
+<div class="desc"><p>This module contains utility functions unlikely to be of use to anyone else.</p>
+<pre><code class="py">from pafpy.utils import first_n_bytes, is_compressed
+</code></pre></div>
+</dd>
 </dl>
 </section>
 <section>
@@ -418,6 +458,8 @@ alt="logo" height="150" style="float: right;">
 <li><a href="#basic">Basic</a></li>
 <li><a href="#advanced">Advanced</a><ul>
 <li><a href="#manual-openclose">Manual open/close</a></li>
+<li><a href="#compressed-input">Compressed input</a></li>
+<li><a href="#working-with-file-streamsobjects">Working with file streams/objects</a></li>
 <li><a href="#fetch-individual-records">Fetch individual records</a></li>
 <li><a href="#working-with-strands">Working with strands</a></li>
 <li><a href="#paf-records">PAF records</a></li>
@@ -449,6 +491,7 @@ alt="logo" height="150" style="float: right;">
 <li><code><a title="pafpy.pafrecord" href="pafrecord.html">pafpy.pafrecord</a></code></li>
 <li><code><a title="pafpy.strand" href="strand.html">pafpy.strand</a></code></li>
 <li><code><a title="pafpy.tag" href="tag.html">pafpy.tag</a></code></li>
+<li><code><a title="pafpy.utils" href="utils.html">pafpy.utils</a></code></li>
 </ul>
 </li>
 </ul>

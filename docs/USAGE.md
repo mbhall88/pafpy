@@ -70,6 +70,50 @@ assert paf.closed
 Admittedly, this is a contrived example, and we could have still used the context
 manager, but you get the point 😉.
 
+### Compressed input
+
+If your PAF file has been compressed with [`gzip`][gzip] you don't need to do anything -
+just pass the filepath as you would any other. Compression is tested by reading the
+first two bytes of the file, so the filepath doesn't even need a `.gz` extension.
+
+```py
+from pafpy import PafFile
+
+path = "sample.paf.gz"
+
+with PafFile(path) as paf:
+    for record in paf:
+        # do something with your records
+```
+
+### Working with file streams/objects
+
+An already-open file can also be used to construct a `pafpy.paffile.PafFile` object. If
+a `PafFile` is constructed with an open file like this there is no need to open the
+`PafFile`.
+
+```py
+with open("sample.paf") as fileobj:
+    paf = PafFile(fileobj)
+    # no need to open the paf
+    for record in paf:
+        # do something with record
+```
+
+If you want to use stdin as your PAF source, it is strongly recommended you use `"-"` to
+construct the `PafFile`. The library will auto-detect if stdin is compressed and will
+decompress it accordingly.
+
+```py
+paf = PafFile("-")
+# note: stdin is a stream so doesn't need to be opened
+for record in paf:
+    # do something with record
+```
+
+>  Advanced users: If you **must** use `sys.stdin` and not `"-"` then please pass
+>  `sys.stdin.buffer`
+
 ### Fetch individual records
 
 `for` loops aren't the only way of retrieving records in a file. You can also ask for
@@ -82,7 +126,7 @@ path = "path/to/sample.paf"
 
 with PafFile(path) as paf:
     record = next(paf)
-# do something with your lonely record
+    # do something with your lonely record
 ```
 
 ### Working with strands
@@ -158,9 +202,9 @@ assert record1 == record2
 ### SAM-like optional fields/tags
 
 Each additional column after the 12th column in a PAF file is a [SAM-like tag][tag]. The
-`pafpy.tag.Tag` class tries to make working with tags simple. You can extract tags
-from a `PafRecord` using `pafpy.pafrecord.PafRecord.get_tag`, or you may like to
-construct one yourself.  
+`pafpy.tag.Tag` class tries to make working with tags simple. You can extract tags from
+a `PafRecord` using `pafpy.pafrecord.PafRecord.get_tag`, or you may like to construct
+one yourself.  
 Let's look at some of these options.
 
 ```py
@@ -206,8 +250,9 @@ except InvalidTagFormat as err:
 assert err_msg == "VALUE of tag NM:i:foo is not the expected TYPE"
 ```
 
+[api-docs]: https://pafpy.xyz/#header-submodules
 [blast]: https://lh3.github.io/2018/11/25/on-the-definition-of-sequence-identity#blast-identity
+[gzip]: https://www.gnu.org/software/gzip/manual/gzip.html
 [issue]: https://github.com/mbhall88/pafpy/issues
 [tag]: https://samtools.github.io/hts-specs/SAMtags.pdf
-[api-docs]: https://pafpy.xyz/#header-submodules
 
