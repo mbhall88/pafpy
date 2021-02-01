@@ -2,10 +2,9 @@
 
 A lightweight library for working with [PAF][PAF] (Pairwise mApping Format) files.
 
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/mbhall88/pafpy?sort=semver)
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mbhall88/pafpy/Python_package)](https://github.com/mbhall88/pafpy/actions)
 [![codecov](https://codecov.io/gh/mbhall88/pafpy/branch/master/graph/badge.svg)](https://codecov.io/gh/mbhall88/pafpy)
-[![PyPI](https://img.shields.io/pypi/v/pafpy)](https://pypi.org/project/pafpy/)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pafpy)
 ![License](https://img.shields.io/github/license/mbhall88/pafpy)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -13,7 +12,7 @@ A lightweight library for working with [PAF][PAF] (Pairwise mApping Format) file
 
 [TOC]: #
 
-# Table of Contents
+## Table of Contents
 - [Install](#install)
   - [PyPi](#pypi)
   - [Conda](#conda)
@@ -21,16 +20,21 @@ A lightweight library for working with [PAF][PAF] (Pairwise mApping Format) file
 - [Usage](#usage)
 - [Contributing](#contributing)
 
-
 ## Install
 
 ### PyPi
+
+[![PyPI](https://img.shields.io/pypi/v/pafpy)](https://pypi.org/project/pafpy/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pafpy)
 
 ```sh
 pip install pafpy
 ```
 
 ### Conda
+
+![Conda](https://img.shields.io/conda/pn/bioconda/pafpy)
+[![Conda (channel only)](https://img.shields.io/conda/vn/bioconda/pafpy)](https://bioconda.github.io/recipes/pafpy/README.html)
 
 ```sh
 conda install -c bioconda pafpy
@@ -54,8 +58,8 @@ make test-code
 ## Usage
 
 For full usage, please refer to the [documentation][docs]. If there is any functionality
-you feel is missing or would make `pafpy` more user-friendly, please raise an issue
-with a feature request.
+you feel is missing or would make `pafpy` more user-friendly, please raise an issue with
+a feature request.
 
 In the below basic usage pattern, we collect the [BLAST identity][blast] of all primary
 alignments in our PAF file into a list.
@@ -97,9 +101,9 @@ with PafFile(path) as paf:
 
 If you would like to contribute to `pafpy`, checkout [`CONTRIBUTING.md`][contribute].
 
-[poetry]: https://python-poetry.org/
 [PAF]: https://github.com/lh3/miniasm/blob/master/PAF.md
-[docs]: https://pafpy.xyz/
 [blast]: https://lh3.github.io/2018/11/25/on-the-definition-of-sequence-identity#blast-identity
 [contribute]: https://github.com/mbhall88/pafpy/blob/master/CONTRIBUTING.md
+[docs]: https://pafpy.xyz/
+[poetry]: https://python-poetry.org/
 
