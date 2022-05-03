@@ -3,7 +3,7 @@ COVG_REPORT = htmlcov/index.html
 DOCS_DIR = docs/
 DOCS_TEMPLATE = docs/templates/
 OS := $(shell uname -s)
-VERSION := $(shell poetry version | grep -P '(?P<version>\d.\d.\d)' --only-matching)
+VERSION := $(shell poetry version -s)
 BOLD := $(shell tput bold)
 NORMAL := $(shell tput sgr0)
 # MAIN #########################################################################
@@ -19,7 +19,7 @@ install:
 # TIDY #################################################################
 .PHONY: fmt
 fmt: clean
-	poetry run isort --apply tests/*.py $(PROJECT)/*.py
+	poetry run isort tests/*.py $(PROJECT)/*.py
 	poetry run black .
 
 .PHONY: lint

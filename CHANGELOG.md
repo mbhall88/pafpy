@@ -7,6 +7,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## Changed
+
+- Update (dev) versions for `black`, `isort`, `pytest`, and `click`
+
 ## [0.2.0]
 
 ### Added

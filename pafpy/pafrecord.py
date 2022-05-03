@@ -44,7 +44,7 @@ class PafRecord(NamedTuple):
     """A single entry (row) in a [PAF][paf] file.
 
     There are two ways to construct a `PafRecord`:
-    
+
     1. The default constructor: where you specify each member variable manually.
     2. The `PafRecord.from_str` factory constructor: where you create a
        `PafRecord` directly from a `str`.
