@@ -3,12 +3,12 @@ name = "pafpy"
 version = "0.2.0"
 description = "A lightweight library for working with PAF (Pairwise mApping Format) files"
 license = "Unlicense"
-authors = ["Michael Hall <michael@mbh.sh>"]
-maintainers = ["Michael Hall <michael@mbh.sh>"]
+authors = ["Michael Hall <mhaldini@icloud.com>"]
+maintainers = ["Michael Hall <mhaldini@icloud.com>"]
 readme = "README.md"
 homepage = "https://github.com/mbhall88/pafpy"
 repository = "https://github.com/mbhall88/pafpy"
-documentation = "https://mbh.sh/pafpy"
+documentation = "https://mbhall88.github.io/pafpy/"
 keywords = ["paf", "python", "bioinformatics", "library", "alignment"]
 classifiers = [
     "Intended Audience :: Science/Research",
